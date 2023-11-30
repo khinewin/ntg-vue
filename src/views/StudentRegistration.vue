@@ -2,7 +2,7 @@
     <div class="container">
             <div class="row justify-content-center">
                 <div class="col-sm-6 my-4">
-                        <div class="card shadow-sm border-0">
+                        <div class="card shadow-sm">
                             <div class="card-body">
                                         <h5 class="text-center text-primary mb-5">Student Registration Form</h5>
                                         <form @submit.prevent="submitRegister">

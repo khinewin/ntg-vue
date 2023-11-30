@@ -1,0 +1,110 @@
+<template>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="row justify-content-center my-4">
+                    <div class="col-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                    <h5 class="text-primary text-center">NTG Technology APP</h5>
+                                    <h6 class="text-secondary text-center">Login</h6>
+                                    <form class="mt-5" @submit.prevent="doSignin">
+                                        <div v-if="login_msg" class="text-success text-center small">{{ login_msg }}</div>
+
+                                        <div v-if="firebase_msg" class="text-danger text-center small">{{ firebase_msg }}</div>
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">E-mail</label>
+                                                <input type="email" class="form-control" id="email" v-model="email"  :class="{'is-invalid' : errors.email}">
+                                                <span v-if="errors.email" class="text-danger small">{{ errors.email }}</span>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="password" class="form-label">Password</label>
+                                                <input type="password" class="form-control" id="password" v-model="password" :class="{'is-invalid' : errors.password}">
+                                                <span v-if="errors.password" class="text-danger small">{{ errors.password }}</span>
+                                            </div>
+                                            <div class="mb-3">
+                                                <button type="submit" class="btn btn-primary btn-lg">Signin</button>
+                                            </div>
+                                    </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+import { getAuth,onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+
+export default {
+    name : "AppLogin",
+    data(){
+        return{
+            email :"",
+            password :"",
+            errors: {
+                email : "",
+                password :""
+            },
+            firebase_msg: "",
+            login_msg:""
+            
+        }
+    },
+    mounted(){
+       
+    },
+    
+    methods: {
+        
+        doSignin(){
+            this.checkValidataion();
+            if(!this.errors.email && !this.errors.password){
+                const auth=getAuth();
+                signInWithEmailAndPassword(auth, this.email, this.password)
+                .then((res)=>{
+                    this.firebase_msg="";
+                    this.$store.dispatch("setLoginUser", res.user)
+                    this.email="";
+                    this.password="";
+                    this.login_msg="Authentication success.";
+                    setTimeout(() => {
+                        this.login_msg="";
+                    }, 3000);
+                })
+                .catch((rej)=>{
+                    this.firebase_msg=rej.code
+                })
+            }
+
+            
+        },
+        checkValidataion(){
+           
+            if(!this.email){
+                    this.errors.email="E-mail field is required."
+            }else{
+               if(! this.validEmail(this.email)){
+                        this.errors.email="Valid email required."
+               }else{
+                this.errors.email="";
+               }
+            }
+            if(!this.password){
+                    this.errors.password="Password field is required."
+            }else{
+                    this.errors.password="";
+            }
+           
+        },
+        validEmail:function(email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+    }
+}
+</script>
+<style lang="">
+    
+</style>

@@ -1,5 +1,5 @@
 <template>
-      <nav-bar></nav-bar>
+  <nav-bar :loginEmail="loginEmail" :loginUid="loginUid" :isLogin="isLogin"></nav-bar>
   
   <router-view/>
   <div>
@@ -10,6 +10,7 @@
     import NavBar  from "./views/NavBar.vue"
     import FooterBar from "./views/FooterBar.vue"
    
+    import { getAuth,onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 
     export default{
         components :{
@@ -21,6 +22,30 @@
 
             }
         },
+        mounted(){
+          this.checkLogin();
+        },
+        methods:{
+          checkLogin(){
+            const auth=getAuth();
+            onAuthStateChanged(auth, (user)=>{
+                if(user){
+                  this.$store.dispatch("setLoginUser", user)
+                }
+            })
+          },
+        },
+        computed: {
+        isLogin(){
+            return this.$store.state.isLogin;
+        },
+        loginEmail(){
+            return this.$store.state.user.email;
+        },
+        loginUid(){
+            return this.$store.state.user.uid;
+        }
+    },
         
 
     }

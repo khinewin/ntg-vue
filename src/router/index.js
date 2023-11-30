@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import PostDetails from "../views/PostDetails.vue"
 import StudentRegistration from '@/views/StudentRegistration.vue'
+import AppLogin from "@/views/AppLogin.vue"
 
 const routes = [
   {
@@ -20,6 +21,10 @@ const routes = [
   {
     path: "/student-registration",
     component: StudentRegistration
+  },
+  {
+    path: "/app-login",
+    component : AppLogin
   }
 ]
 
