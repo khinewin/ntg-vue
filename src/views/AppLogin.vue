@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="row justify-content-center my-4">
-                    <div class="col-4">
+                    <div class="col-sm-4">
                         <div class="card shadow-sm">
                             <div class="card-body">
                                     <h5 class="text-primary text-center">NTG Technology APP</h5>
@@ -23,7 +23,12 @@
                                                 <span v-if="errors.password" class="text-danger small">{{ errors.password }}</span>
                                             </div>
                                             <div class="mb-3">
-                                                <button type="submit" class="btn btn-primary btn-lg">Signin</button>
+                                                <button type="submit" class="btn btn-primary" :class="{disabled: isLoading}">
+                                                    <div class="spinner-border text-light spinner-border-sm" role="status" v-if="isLoading">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    Signin
+                                                </button>
                                             </div>
                                     </form>
                             </div>
@@ -36,6 +41,7 @@
 </template>
 <script>
 import { getAuth,onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import store from "../store"
 
 export default {
     name : "AppLogin",
@@ -48,19 +54,20 @@ export default {
                 password :""
             },
             firebase_msg: "",
-            login_msg:""
+            login_msg:"",
+            isLoading: false,
             
         }
     },
-    mounted(){
-       
-    },
+
     
     methods: {
+
         
         doSignin(){
             this.checkValidataion();
             if(!this.errors.email && !this.errors.password){
+                this.isLoading=true;
                 const auth=getAuth();
                 signInWithEmailAndPassword(auth, this.email, this.password)
                 .then((res)=>{
@@ -70,10 +77,13 @@ export default {
                     this.password="";
                     this.login_msg="Authentication success.";
                     setTimeout(() => {
+                        this.isLoading=false;
                         this.login_msg="";
-                    }, 3000);
+                        this.$router.push("dashboard")
+                    }, 2000);
                 })
                 .catch((rej)=>{
+                    this.isLoading=false;
                     this.firebase_msg=rej.code
                 })
             }

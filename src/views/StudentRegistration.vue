@@ -8,38 +8,43 @@
                                         <form @submit.prevent="submitRegister">
                                             <div class="mb-3">
                                                 <label for="name" class="form-label">Name</label>
-                                                <input type="text" class="form-control" id="name" v-model="name" :class="{'is-invalid' : errors.name}">
+                                                <input @keydown="clearError('name')" type="text" class="form-control" id="name" v-model="name" :class="{'is-invalid' : errors.name}">
                                                 <span v-if="errors.name" class="text-danger small">{{ errors.name }}</span>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="email" class="form-label">E-mail</label>
-                                                <input type="email" class="form-control" id="email" v-model="email"  :class="{'is-invalid' : errors.email}">
+                                                <input @keydown="clearError('email')" type="email" class="form-control" id="email" v-model="email"  :class="{'is-invalid' : errors.email}">
                                                 <span v-if="errors.email" class="text-danger small">{{ errors.email }}</span>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="phone" class="form-label">Phone</label>
-                                                <input type="tel" class="form-control" id="phone" v-model="phone" :class="{'is-invalid' : errors.phone}">
+                                                <input @keydown="clearError('phone')" type="tel" class="form-control" id="phone" v-model="phone" :class="{'is-invalid' : errors.phone}">
                                                 <span v-if="errors.phone" class="text-danger small">{{ errors.phone }}</span>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="eduction" class="form-label">Education</label>
-                                                <textarea id="education" class="form-control" :class="{'is-invalid' : errors.education}" v-model="education" placeholder="e.g., Technology or Computer University, Second Year. or Any Graduate"></textarea>
+                                                <textarea @keydown="clearError('education')" id="education" class="form-control" :class="{'is-invalid' : errors.education}" v-model="education" placeholder="e.g., Technology or Computer University, Second Year. or Any Graduate"></textarea>
                                                 <span v-if="errors.education" class="text-danger small">{{ errors.education }}</span>
                                             </div>
-                                            <div class="mb-3">
+                                            <div class="mb-5">
                                                 <label  class="form-label" > Training Course</label>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" :class="{'is-invalid' : errors.course}"  v-model="course" value="Web Development Programming Level - 1 " name="flexRadioDefault" id="flexRadioDefault1">
+                                                    <input @click="clearError('course')" class="form-check-input" type="radio" :class="{'is-invalid' : errors.course}"  v-model="course" value="Web Development Programming Level - 1 " name="flexRadioDefault" id="flexRadioDefault1">
                                                     <label class="form-check-label" for="flexRadioDefault1">Web Development Programming Level - 1 </label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="Web Development Programming Level - 2" name="flexRadioDefault" id="flexRadioDefault2" >
+                                                    <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="Web Development Programming Level - 2" name="flexRadioDefault" id="flexRadioDefault2" >
                                                     <label class="form-check-label" for="flexRadioDefault2">Web Development Programming Level - 2  </label>
                                                 </div>
                                                 <span v-if="errors.course" class="text-danger small">{{ errors.course }}</span>
                                             </div>
                                             <div class="mb-5">
-                                                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                                                    <button type="submit" class="btn btn-primary btn-lg" :class="{disabled: isLoading}">
+                                                        <div class="spinner-border text-light spinner-border-sm" role="status" v-if="isLoading">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                         </div>
+                                                        Submit
+                                                    </button>
                                             </div>
                                         </form>
                             </div>
@@ -103,7 +108,8 @@ export default {
                 email:"",
                 phone: "",
                 course :""
-          }
+          },
+          isLoading: false,
 
         }
     },
@@ -111,6 +117,26 @@ export default {
     },
 
     methods:{
+
+        clearError(error){
+                switch(error){
+                        case "name":
+                            this.errors.name="";
+                            break;
+                         case "email":
+                            this.errors.email="";
+                            break;
+                         case "phone":
+                            this.errors.phone="";
+                            break;
+                        case "education":
+                            this.errors.education="";
+                            break;
+                        case "course":
+                            this.errors.course="";
+                            break;              
+                }
+        },
 
         toggleLoadingModal(action){
                 const myModal = new bootstrap.Modal('#loadingModal', {
@@ -132,6 +158,7 @@ export default {
            
             this.checkValidataion();
             if(!this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.education && !this.errors.course){
+                this.isLoading=true;
                 this.toggleLoadingModal("show");
                 this.showSpinner=true
                 const saveCollection=collection(db, "students")
@@ -144,6 +171,7 @@ export default {
                 created_at : new Date().toLocaleDateString() + ", " + new Date().toLocaleTimeString()
                 })
                if(saveData.id){
+                this.isLoading=false;
                 this.student.name=this.name;
                 this.student.email=this.email;
                 this.student.phone=this.phone;

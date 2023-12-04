@@ -1,5 +1,5 @@
 <template>
-  <nav-bar :loginEmail="loginEmail" :loginUid="loginUid" :isLogin="isLogin"></nav-bar>
+  <nav-bar :loginEmail="loginEmail" :loginUid="loginUid" :isAuthenticated="isAuthenticated"></nav-bar>
   
   <router-view/>
   <div>
@@ -19,32 +19,42 @@
         },
         data(){
             return {
-
+               
             }
         },
         mounted(){
-          this.checkLogin();
+            this.checkLogin();
+      
         },
+
+        computed:{
+            isAuthenticated (){
+                return this.$store.getters.isAuthenticated;
+            },
+            loginEmail (){
+              return this.$store.getters.email;
+            },
+            loginUid(){
+              return this.$store.getters.uid;
+            }
+        },
+       
         methods:{
           checkLogin(){
-            const auth=getAuth();
-            onAuthStateChanged(auth, (user)=>{
+              const auth=getAuth();
+              onAuthStateChanged(auth, (user)=>{
                 if(user){
                   this.$store.dispatch("setLoginUser", user)
+               
+
                 }
             })
+       
+            
+           
           },
-        },
-        computed: {
-        isLogin(){
-            return this.$store.state.isLogin;
-        },
-        loginEmail(){
-            return this.$store.state.user.email;
-        },
-        loginUid(){
-            return this.$store.state.user.uid;
-        }
+      
+        
     },
         
 
