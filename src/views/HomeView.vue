@@ -20,7 +20,7 @@
                     <h4 class="card-title text-center mb-4">{{ post.title }}</h4>
                     <!-- <div v-html="post.text_body"></div> -->
                     <div class="d-grid">
-                      <button type="button" class="btn btn-primary" @click="viewDetails(post.id)"><i class="fa-brands fa-readme" ></i> View Details</button>
+                      <button type="button" class="btn btn-primary" @click="viewDetails(post.id)"> <i class="fa-solid fa-angles-right"></i>  View Details</button>
                     </div>
                 </div>
               </div>

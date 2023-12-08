@@ -6,6 +6,11 @@
                 <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mb-2 mb-lg-0">
+                        <li class="nav-item" >
+                             <a href="#!" class="nav-link" ><i class="fa-solid fa-bars"></i></a>
+                        </li> 
+                    </ul>
                     <ul class="navbar-nav ms-auto me-auto mb-2 mb-lg-0">
                         <li class="nav-item" >
                                 <router-link to="/student-registration" class="nav-link"><i class="fa-solid fa-id-card"></i> Student registration</router-link>
@@ -17,7 +22,7 @@
                                 <router-link to="/app-login" class="nav-link"><i class="fa-solid fa-right-to-bracket"></i> Signin</router-link>
                         </li>    
                         <li class="nav-item" v-if="isAuthenticated">
-                                <router-link to="/dashboard" class="nav-link"><i class="fa-solid fa-bars"></i> Dashboard</router-link>
+                                <router-link to="/dashboard" class="nav-link"><i class="fa-solid fa-earth-americas"></i> Dashboard</router-link>
                         </li>    
                         <li class="nav-item dropdown" v-if="isAuthenticated">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -52,6 +57,7 @@ import { getAuth,signOut } from "firebase/auth";
             }
         },
         methods:{
+           
             setLogoutUser(){
                 const auth=getAuth();
                 signOut(auth)

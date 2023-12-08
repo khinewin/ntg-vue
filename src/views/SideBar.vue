@@ -1,15 +1,26 @@
 <template lang="">
-   <div class="mx-2 my-2">
+   <div class="mx-2 my-2 ">
     <ul class="list-group list-group-flush">
-            <li class="list-group-item"><router-link to="/dashboard" class="nav-link"><i class="fa-solid fa-bars"></i> Dashboard</router-link></li>
+            <li class="list-group-item"><router-link to="/dashboard" class="nav-link"><i class="fa-solid fa-earth-americas"></i> Dashboard</router-link></li>
+            <li class="list-group-item" ><router-link to="/enrolled-students" class="nav-link"><i class="fa-solid fa-users"></i> Enrolled students</router-link></li>
+            <li class="list-group-item"><router-link to="/students" class="nav-link"><i class="fa-solid fa-users-line"></i> Students</router-link></li>
+            <li class="list-group-item"><router-link to="/new-student" class="nav-link"><i class="fa-solid fa-user-plus"></i> Add student</router-link></li>
     </ul>
    </div>
 </template>
 <script>
 export default {
-    name: "SideBar"
+    name: "SideBar",
+    data(){
+        return {
+
+        }
+    }
 }
 </script>
-<style lang="">
-    
+<style lang="css">
+     .router-link-active {
+        color: #0B5ED7 !important;
+        display:  block !important;
+     }
 </style>

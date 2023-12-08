@@ -5,6 +5,10 @@ import StudentRegistration from '@/views/StudentRegistration.vue'
 import AppLogin from "@/views/AppLogin.vue"
 import store  from '@/store/index.js'
 import AppDashboard from '@/views/AppDashboard'
+import EnrolledStudentsVue from '@/views/EnrolledStudents.vue'
+import AppStudents from "@/views/AppStudents.vue"
+import AppNewStudent from "@/views/AppNewStudent.vue"
+import AppEditStudent from '@/views/AppEditStudent.vue'
 
 const routes = [
   {
@@ -29,13 +33,37 @@ const routes = [
     path: "/app-login",
     component : AppLogin,
     name: "AppLogin",
-    meta : {guest: true}
+    meta : {guest: false}
   },
   {
     path: "/dashboard",
     component: AppDashboard,
     name: "AppDashboard",
-    meta : {requiresAuth : true}
+    meta : {requiresAuth : false}
+  },
+  {
+    path: "/enrolled-students",
+    component: EnrolledStudentsVue,
+    name: "EnrolledStudents",
+    meta : {requiresAuth : false}
+  },
+  {
+    path: "/students",
+    component: AppStudents,
+    name: "AppStudents",
+    meta : {requiresAuth : false}
+  },
+  {
+    path: "/new-student",
+    component: AppNewStudent,
+    name: "AppNewStudent",
+    meta : {requiresAuth : false}
+  },
+  {
+    path: "/edit-student/:id", 
+    component: AppEditStudent,
+    name: "AppEditStudent",
+    meta : {requiresAuth :false}
   }
 ]
 

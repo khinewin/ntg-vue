@@ -4,37 +4,37 @@
                 <div class="col-sm-6 my-4">
                         <div class="card shadow-sm">
                             <div class="card-body">
-                                        <h5 class="text-center text-primary mb-5">Student Registration Form</h5>
+                                        <h5 class="text-center text-dark  mb-5">Student Registration Form</h5>
                                         <form @submit.prevent="submitRegister">
                                             <div class="mb-3">
-                                                <label for="name" class="form-label">Name</label>
-                                                <input @keydown="clearError('name')" type="text" class="form-control" id="name" v-model="name" :class="{'is-invalid' : errors.name}">
+                                                <label for="name" class="form-label small">Name</label>
+                                                <input @keydown="clearError('name')" type="text" class="form-control form-control-sm" id="name" v-model="name" :class="{'is-invalid' : errors.name}">
                                                 <span v-if="errors.name" class="text-danger small">{{ errors.name }}</span>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="email" class="form-label">E-mail</label>
-                                                <input @keydown="clearError('email')" type="email" class="form-control" id="email" v-model="email"  :class="{'is-invalid' : errors.email}">
+                                                <label for="email" class="form-label small">E-mail</label>
+                                                <input @keydown="clearError('email')" type="email" class="form-control form-control-sm" id="email" v-model="email"  :class="{'is-invalid' : errors.email}">
                                                 <span v-if="errors.email" class="text-danger small">{{ errors.email }}</span>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="phone" class="form-label">Phone</label>
-                                                <input @keydown="clearError('phone')" type="tel" class="form-control" id="phone" v-model="phone" :class="{'is-invalid' : errors.phone}">
+                                                <label for="phone" class="form-label small">Phone</label>
+                                                <input @keydown="clearError('phone')" type="tel" class="form-control form-control-sm" id="phone" v-model="phone" :class="{'is-invalid' : errors.phone}">
                                                 <span v-if="errors.phone" class="text-danger small">{{ errors.phone }}</span>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="eduction" class="form-label">Education</label>
-                                                <textarea @keydown="clearError('education')" id="education" class="form-control" :class="{'is-invalid' : errors.education}" v-model="education" placeholder="e.g., Technology or Computer University, Second Year. or Any Graduate"></textarea>
+                                                <label for="eduction" class="form-label small">Education</label>
+                                                <textarea @keydown="clearError('education')" id="education" class="form-control form-control-sm" :class="{'is-invalid' : errors.education}" v-model="education" placeholder="e.g., Technology or Computer University, Second Year. or Any Graduate"></textarea>
                                                 <span v-if="errors.education" class="text-danger small">{{ errors.education }}</span>
                                             </div>
-                                            <div class="mb-5">
-                                                <label  class="form-label" > Training Course</label>
+                                            <div class="mb-3">
+                                                <label  class="form-label small" > Training Course</label>
                                                 <div class="form-check">
                                                     <input @click="clearError('course')" class="form-check-input" type="radio" :class="{'is-invalid' : errors.course}"  v-model="course" value="Web Development Programming Level - 1 " name="flexRadioDefault" id="flexRadioDefault1">
-                                                    <label class="form-check-label" for="flexRadioDefault1">Web Development Programming Level - 1 </label>
+                                                    <label class="form-check-label small" for="flexRadioDefault1">Web Development Programming Level - 1 </label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="Web Development Programming Level - 2" name="flexRadioDefault" id="flexRadioDefault2" >
-                                                    <label class="form-check-label" for="flexRadioDefault2">Web Development Programming Level - 2  </label>
+                                                    <label class="form-check-label small" for="flexRadioDefault2">Web Development Programming Level - 2  </label>
                                                 </div>
                                                 <span v-if="errors.course" class="text-danger small">{{ errors.course }}</span>
                                             </div>
@@ -161,14 +161,15 @@ export default {
                 this.isLoading=true;
                 this.toggleLoadingModal("show");
                 this.showSpinner=true
-                const saveCollection=collection(db, "students")
+                const saveCollection=collection(db, "enrolled_students")
               let saveData=await addDoc(saveCollection, {
                 name: this.name,
                 email: this.email,
                 phone : this.phone,
-                eduction: this.education,
+                education: this.education,
                 course: this.course,
-                created_at : new Date().toLocaleDateString() + ", " + new Date().toLocaleTimeString()
+                created_at : new Date().toLocaleDateString() + ", " + new Date().toLocaleTimeString(),
+                order_date: new Date(),
                 })
                if(saveData.id){
                 this.isLoading=false;
