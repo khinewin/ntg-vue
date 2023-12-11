@@ -1,16 +1,28 @@
 <template>
   <div class="home">
         <div class="container mt-4">
-          <div v-if="showSpinner" class="row">
-              <div class="col-12 text-center py-5">
-                <div class="spinner-border text-primary my-5" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                  <div class="text-center mt-2">
-                    <span>Fetching data from server...</span>
-                  </div>
-              </div>
-          </div>
+                                <div class="row my-5" v-if="showSpinner">
+                                        <div class="col-6">
+                                                <div class="spinner-grow text-success float-end" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                        </div>
+                                        <div class="col-6">
+                                                <div class="spinner-grow text-danger" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                        </div>
+                                        <div class="col-6">
+                                                <div class="spinner-grow text-warning float-end" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                        </div>
+                                        <div class="col-6">
+                                                <div class="spinner-grow text-info" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                        </div>
+                                </div>
           <div class="row" v-else>
             <div v-for="post in posts" :key="post.id" class="col-sm-6 mb-4">
             <!--start col-->

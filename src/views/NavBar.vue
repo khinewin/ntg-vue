@@ -6,12 +6,8 @@
                 <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mb-2 mb-lg-0">
-                        <li class="nav-item" >
-                             <a href="#!" class="nav-link" ><i class="fa-solid fa-bars"></i></a>
-                        </li> 
-                    </ul>
-                    <ul class="navbar-nav ms-auto me-auto mb-2 mb-lg-0">
+                    
+                    <ul class="navbar-nav ms-auto me-auto mb-2 mb-lg-0" >
                         <li class="nav-item" >
                                 <router-link to="/student-registration" class="nav-link"><i class="fa-solid fa-id-card"></i> Student registration</router-link>
                         </li> 

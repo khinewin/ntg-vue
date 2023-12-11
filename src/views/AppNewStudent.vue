@@ -42,11 +42,12 @@
                                                 </select>
                                                 <label for="course" class="small">Course</label>
                                             </div>
-                                            <div class="text-danger small ms-2 mb-2" v-if="errors.course_fees">{{errors.course_fees}}</div>
+                                            <div class="text-danger small ms-2 mb-2" v-if="errors.deposit">{{errors.deposit}}</div>
                                             <div class="mb-3 form-floating">
-                                                <input type="number" @keydown="clearError('course_fees')" v-model="course_fees" :class="{'is-invalid' : errors.course_fees}" class="form-control form-control-sm" id="course_fees" placeholder="Course fees (Deposit)">
-                                                <label for="course_fees" class="small">Course fees (Deposit)</label>
+                                                <input type="number" @keydown="clearError('deposit')" v-model="deposit" :class="{'is-invalid' : errors.deposit}" class="form-control form-control-sm" id="deposit" placeholder="Course fees (Deposit)">
+                                                <label for="deposit" class="small">Course fees (Deposit)</label>
                                             </div>
+                                           
                                             <div class="text-danger small ms-2 mb-2" v-if="errors.remark">{{errors.remark}}</div>
                                             <div class="mb-3 form-floating">
                                                 <textarea   @keydown="clearError('remark')" v-model="remark" id="remark" class="form-control form-control-sm" :class="{'is-invalid' : errors.remark}" placeholder="Remark"></textarea>
@@ -71,7 +72,7 @@
 </template>
 <script>
 import SideBar from '@/views/SideBar.vue'
-import { doc, setDoc, collection, addDoc } from "firebase/firestore"; 
+import { doc, setDoc, collection, query, getDocs, orderBy, addDoc, where } from "firebase/firestore"; 
 import db from "../firebase"
 
 export default {
@@ -86,33 +87,58 @@ export default {
             phone: "",
             course: "",
             course_fees: "",
+            deposit:"",
             remark:"",
             errors: {
                 name: "",
                 email: "",
                 phone: "",
                 course: "",
-                course_fees: "",
+                deposit: "",
                 remark:"",
             },
             isLoading: false,
+            batch:{},
         }
     },
+    mounted(){
+        this.fetchBatch();
+    },
     methods:{
+       async fetchBatch(){
+            const q = query(collection(db, "training"), where("active", "==", true));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                let batch={};   
+                batch=doc.data().batch;
+                this.batch=batch;
+            })
+        },
         async saveStudent(){
                 this.checkValidation();
-                if(!this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.course && !this.errors.course_fees && !this.errors.remark){
+                if(!this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.course && !this.errors.deposit && !this.errors.remark){
                     this.isLoading=true;
+                    if(this.course==="Web Development Level - 1"){
+                        this.course_fees=150000;
+                    }else
+                     if(this.course==="Web Development Level - 2"){
+                        this.course_fees=250000;
+                    }else
+                    if(this.course==="Web Development Level - 3"){
+                        this.course_fees=250000;
+                    }
                     const saveCollection=collection(db, "students")
                     let saveData=await addDoc(saveCollection, {
                         name: this.name,
                         email: this.email,
                         phone : this.phone,
                         course: this.course,
-                        course_fees: [this.course_fees],
+                        deposit: [this.deposit],
                         created_at : new Date().toLocaleDateString() + ", " + new Date().toLocaleTimeString(),
                         order_date: new Date(),
-                        remark : this.remark
+                        remark : this.remark,
+                        course_fees: this.course_fees,
+                        batch: this.batch
                         })
                     if(saveData.id){
                         this.isLoading=false;                      
@@ -121,8 +147,9 @@ export default {
                         this.email="";
                         this.phone="";
                         this.course="";
-                        this.course_fees="";
+                        this.deposit="";
                         this.remark="";
+                        
                         this.showSpinner=false;
                     }
                 }
@@ -141,8 +168,8 @@ export default {
                         case "course":
                             this.errors.course="";
                             break;
-                        case "course_fees":
-                            this.errors.course_fees="";
+                        case "deposit":
+                            this.errors.deposit="";
                             break;      
                         case "remark":
                             this.errors.remark="";
@@ -174,10 +201,10 @@ export default {
             }else{
                 this.errors.course="";
             }
-            if(!this.course_fees){
-                    this.errors.course_fees="The course fees field is required.";
+            if(!this.deposit){
+                    this.errors.deposit="The deposit  field is required.";
             }else{
-                this.errors.course_fees="";
+                this.errors.deposit="";
             }
             if(!this.remark){
                     this.errors.remark="The remark field is required.";

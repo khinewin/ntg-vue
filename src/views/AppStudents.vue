@@ -12,15 +12,30 @@
                                                 <h4><i class="fa-solid fa-users-line"></i> Students</h4>
                                         </div>
                                         <div class="col-sm-3">
+                                               <div class="input-group">
                                                 <select class="form-control form-control-sm" @change="filterByCourse" v-model="filter_by_course">
                                                                         <option value="">Filter by course</option>
-                                                                        <option value="Web Development Level - 1">WD L-1</option>
+                                                                        <option value="Web Development Level - 1" >WD L-1</option>
                                                                         <option value="Web Development Level - 2">WD L-2</option>
                                                                         <option value="Web Development Level - 3">WD L-3</option>
-                                                                </select>                                                       
+                                                                </select>        
+                                                                <div class="input-group-text" @click=clearFilterByCourse><i class="fa-solid fa-circle-xmark d-block"></i></div>     
+                                               </div>                                          
                                         </div>
                                         <div class="col-sm-3">
-                                                <input @keyup="searchByName" type="search" class="form-control form-control-sm" id="search_by_name" placeholder="Search by name" v-model="search_by_name">
+                                               <div class="input-group">
+                                                <select class="form-control form-control-sm" @change="filterByBatch" v-model="filter_by_batch">
+                                                                        <option value="">Filter by batch</option>
+                                                                        <option v-for="b in batchs" :value="b">Batch #{{b}}</option>
+                                                                </select>        
+                                                                <div class="input-group-text" @click=clearFilterByBatch><i class="fa-solid fa-circle-xmark d-block"></i></div>     
+                                               </div>                                          
+                                        </div>
+                                        <div class="col-sm-3">
+                                                <div class="input-group">
+                                                        <input @keydown.enter="searchByName" type="search" class="form-control form-control-sm" id="search_by_name" placeholder="Search by name" v-model="search_by_name">
+                                                        <div class="input-group-text" @click=clearSearchByName><i class="fa-solid fa-circle-xmark d-block"></i></div>   
+                                                </div>  
                                         </div>
                                 </div>
                         </div>
@@ -50,7 +65,7 @@
                                         </div>
                                 </div>
                                 <ul class="list-group" v-for="stu in allStudents" :key="stu.id" v-else>
-                                    <li class="list-group-item list-group-item-action mb-2 shadow-sm border-5 border-end-0 border-top-0 border-bottom-0 border-success">
+                                    <li class="list-group-item list-group-item-action mb-2 shadow-sm border-5 border-end-0 border-top-0 border-bottom-0" :class="{ 'border-warning': stu.course_fees > stu.deposit, 'border-success': stu.deposit >= stu.course_fees}">
                                             <div class="row">
                                                 
                                                 <div class="col-sm-6 col-md-3 mb-2">
@@ -72,7 +87,7 @@
                                                 
                                                 <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">Course fees (Deposit)</div>
-                                                        <div class="text-center small fw-semibold">{{stu.course_fees}} MMK</div>
+                                                        <div class="text-center small fw-semibold">{{stu.deposit}} MMK</div>
                                                 </div>
                                                 <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">Date</div>
@@ -100,7 +115,7 @@
 </template>
 <script>
 import SideBar from './SideBar.vue';
-import { doc, setDoc, collection, addDoc, deleteDoc, query, getDocs,orderBy, getCountFromServer, sum } from "firebase/firestore"; 
+import { doc, setDoc, collection, addDoc, deleteDoc, query, getDocs,orderBy,startAt, endAt, getCountFromServer, sum, where } from "firebase/firestore"; 
 import db from "../firebase"
 
 export default {
@@ -113,41 +128,127 @@ export default {
                 students : [],
                 pageLoading:true,
                 filter_by_course: "",
-                cacheStudents:[],
                 search_by_name:"",
+                level1_price: 150000,
+                level2_price: 250000,
+                batchs:[],
+                filter_by_batch:"",
+                current_batch:"",
         }
     },
     
-    mounted(){
-        this.fetchStudents();
-       
+    mounted(){        
+       this.fetchBatch();
     },
     computed:{
         allStudents(){
                 return this.students;
         }
     },
+    
     methods :{
-        filterByCourse(){
-                let filter;
-              if(this.filter_by_course){
-                filter=this.cacheStudents.filter((stu)=>stu.course===this.filter_by_course);
-              }else{
-                filter=this.cacheStudents;
-              }
-              this.students=filter;
-              
+
+        async fetchBatch(){
+            const q = query(collection(db, "training"), orderBy("batch", "asc"));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                let batch={};   
+                batch=doc.data().batch;
+                this.batchs.unshift(batch);
+                if(doc.data().active){
+                        this.current_batch=doc.data().batch;
+                        this.fetchStudents();
+                }
+            })
         },
-        searchByName(){
-                let filter;
-              if(this.search_by_name){
-                filter=this.cacheStudents.filter((stu)=>{
-                        return stu.name.toLowerCase().includes(this.search_by_name.toLowerCase())
-                })
-              }else{
-                filter=this.cacheStudents;
-              }
-              this.students=filter;
+        clearSearchByName(){
+                this.search_by_name="";
+                this.fetchStudents();
+        },
+        clearFilterByCourse(){
+                this.filter_by_course="";
+                this.fetchStudents();
+        },
+        clearFilterByBatch(){
+                this.filter_by_batch="";
+                this.fetchStudents();
+        },
+        filterByBatch(){
+                this.fetchStudents();
+                this.filter_by_course="";
+                this.search_by_name="";
+        },
+        filterByCourse(){
+                this.fetchStudents();
+              this.filter_by_batch="";
+              this.search_by_name="";
+        },
+       async searchByName(){
+        this.filter_by_batch="";
+        this.filter_by_course="";
+        this.pageLoading=true;
+                const q = query(collection(db, "students"), orderBy("created_at", "asc"));
+            
+            const querySnapshot = await getDocs(q);
+                 let stus=[];
+            querySnapshot.forEach((doc) => {
+                let stu={};              
+           
+                stu.name=doc.data().name;
+                stu.email=doc.data().email;
+                stu.phone=doc.data().phone;
+                stu.deposit=doc.data()["deposit"].reduce((a,b)=>a+b);
+                stu.course=doc.data().course;
+                stu.remark=doc.data().remark;
+                stu.id=doc.id;
+                stu.created_at=doc.data().created_at;
+                stu.course_fees=doc.data().course_fees;
+                stu.batch=doc.data().batch;
+                stus.unshift(stu);
+
+            })
+            let filter_s=stus.filter((s)=>{
+                return s.name.toLowerCase().includes(this.search_by_name.toLowerCase())
+            })
+            this.students=filter_s;
+            this.pageLoading=false;
+        },
+       
+        async fetchStudents(){
+            this.pageLoading=true;
+            let q;
+            if(this.filter_by_batch){
+                 q = query(collection(db, "students"), where("batch", "==", this.filter_by_batch), orderBy("created_at", "asc"));
+            }
+            if(this.filter_by_course){
+                 q = query(collection(db, "students"), where("course", "==", this.filter_by_course), orderBy("created_at", "asc"));
+            }
+                  
+            if(!this.filter_by_batch && !this.filter_by_course && !this.search_by_name){
+                 q = query(collection(db, "students"), where("batch", "==", this.current_batch), orderBy("created_at", "asc"));
+            }
+            
+            const querySnapshot = await getDocs(q);
+            this.students=[];
+            querySnapshot.forEach((doc) => {
+                let stu={};              
+           
+                stu.name=doc.data().name;
+                stu.email=doc.data().email;
+                stu.phone=doc.data().phone;
+                stu.deposit=doc.data()["deposit"].reduce((a,b)=>a+b);
+                stu.course=doc.data().course;
+                stu.remark=doc.data().remark;
+                stu.id=doc.id;
+                stu.created_at=doc.data().created_at;
+                stu.course_fees=doc.data().course_fees;
+                stu.batch=doc.data().batch;
+                this.students.unshift(stu);
+
+            })
+            this.pageLoading=false;
+
+            
         },
         editStudent(id){
                this.$router.push(`edit-student/${id}`)
@@ -164,29 +265,6 @@ export default {
 
                }
         },
-        async fetchStudents(){
-                this.pageLoading=true;
-            const q = query(collection(db, "students"), orderBy("order_date", "asc"));
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach((doc) => {
-                let stu={};               
-           
-                stu.name=doc.data().name;
-                stu.email=doc.data().email;
-                stu.phone=doc.data().phone;
-                stu.course_fees=doc.data()["course_fees"].reduce((a,b)=>a+b);
-                stu.course=doc.data().course;
-                stu.remark=doc.data().remark;
-                stu.id=doc.id;
-                stu.created_at=doc.data().created_at;
-                this.students.unshift(stu);
-                this.cacheStudents.unshift(stu);
-
-            })
-            this.pageLoading=false;
-
-            
-        }
     }
 }
 </script>

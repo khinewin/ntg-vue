@@ -17,7 +17,7 @@
                                                 <h4 class="card-title text-primary py-5">Posts <span class="badge text-bg-success ">{{postCount}}</span></h4>
                                                 <hr>
                                                 <div>
-                                                        <button class="btn btn-secondary"><i class="fa-solid fa-angles-right"></i> Details</button>
+                                                        <button class="btn btn-secondary me-2"><i class="fa-solid fa-angles-right"></i> Details</button>
                                                         <button class="btn btn-primary float-md-end"><i class="fa-solid fa-circle-plus"></i> Add post</button>
                                                 </div>
                                         </div>
@@ -29,7 +29,7 @@
                                                 <h4 class="card-title text-primary py-5">Enrolled students <span class="badge text-bg-primary ">{{studentRegistrationCount}}</span></h4>
                                                 <hr>
                                                 <div >
-                                                        <router-link to="/enrolled-students" class="btn btn-secondary"> <i class="fa-solid fa-angles-right"></i> Details</router-link>
+                                                        <router-link to="/enrolled-students" class="btn btn-secondary me-2"> <i class="fa-solid fa-angles-right"></i> Details</router-link>
                                                         <router-link to="/student-registration" class="btn btn-primary float-md-end"><i class="fa-solid fa-id-card"></i> Student registration</router-link>
                                                 </div>
                                         </div>
@@ -41,7 +41,7 @@
                                                 <h4 class="card-title text-primary py-5">Students <span class="badge text-bg-info ">{{studentsCount}}</span></h4>
                                                 <hr>
                                                 <div >
-                                                        <router-link to="/students" class="btn btn-secondary"> <i class="fa-solid fa-angles-right"></i> Details</router-link>
+                                                        <router-link to="/students" class="btn btn-secondary me-2"> <i class="fa-solid fa-angles-right"></i> Details</router-link>
                                                         <router-link to="/new-student" class="btn btn-primary float-md-end"><i class="fa-solid fa-circle-plus"></i> Add student</router-link>
                                                 </div>
                                         </div>
