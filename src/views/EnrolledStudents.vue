@@ -12,6 +12,9 @@
                 </div>
                 <div class="card shadow-sm my-2">
                     <div class="card-body">
+                        <div class="row my-5"  v-if="!pageLoading && students.length <=0">
+                                <div class="col-12 text-center"><i class="fa-solid fa-circle-info"></i> There are no enrolled students yet.</div>
+                        </div>
                         <div class="row my-5" v-if="pageLoading">
                                         <div class="col-6">
                                                 <div class="spinner-grow text-success float-end" role="status">
@@ -35,30 +38,38 @@
                                         </div>
                                 </div>
                             <ul class="list-group" v-for="stu in students" :key="stu.id" v-else>
-                                    <li class="list-group-item list-group-item-action mb-2 shadow-sm border-5 border-end-0 border-top-0 border-bottom-0 border-primary ">
+                                    <li class="list-group-item list-group-item-action mb-2 shadow-sm border-5 border-end-0 border-top-0 border-bottom-0" :class="{'border-primary ':stu.course==='wdl1', 'border-info ':stu.course==='wdl2', 'border-success ':stu.course==='wdl3'}">
                                             <div class="row">
                                                 
-                                                <div class="col-sm-6 col-md-4 mb-2">
+                                                <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">Name</div>
                                                         <div class="text-center small fw-semibold">{{stu.name}}</div>
                                                 </div>
-                                                <div class="col-sm-6 col-md-4 mb-2">
+                                                <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">E-mail</div>
                                                         <div class="text-center small fw-semibold">{{stu.email}}</div>
                                                 </div>
-                                                <div class="col-sm-6 col-md-4 mb-2">
+                                                <div class="col-sm-6 col-md-3 mb-2">
+                                                        <div class="text-center small fw-light">Phone</div>
+                                                        <div class="text-center small fw-semibold"><a href="#!" @click="callPhone(stu.phone)">{{stu.phone}}</a></div>
+                                                </div>
+                                                <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">Education</div>
                                                         <div class="text-center small fw-semibold">{{stu.education}}</div>
                                                 </div>
-                                                <div class="col-sm-6 col-md-4 mb-2">
+                                                <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">Course</div>
-                                                        <div class="text-center small fw-semibold">{{stu.course}}</div>
+                                                        <div class="text-center small fw-semibold">
+                                                                <span v-if="stu.course==='wdl1'">Web Development Level - 1</span>
+                                                                <span v-if="stu.course==='wdl2'">Web Development Level - 2</span>
+                                                                <span v-if="stu.course==='wdl3'">Web Development Level - 3</span>
+                                                        </div>
                                                 </div>
-                                                <div class="col-sm-6 col-md-4 mb-2">
+                                                <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">Enrolled date</div>
                                                         <div class="text-center small fw-semibold">{{stu.created_at}}</div>
                                                 </div>
-                                                <div class="col-sm-6 col-md-4 mb-2">
+                                                <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">Actions</div>
                                                         <div class="text-center small fw-semibold">
                                                             <a href="#!" class="text-danger" @click="removeEnrolledStudent(stu)"><i class="fa-solid fa-trash"></i></a>
@@ -92,11 +103,14 @@ export default {
         this.fetchStudents();
     },
     methods:{
+        callPhone(phone){
+               window.location.href=`tel:${phone}`
+        },
         async removeEnrolledStudent(stu){
                let doConfirm=confirm(`This enrolled student of  id "${stu.id}" & name "${stu.name}" will remove from database.` )
                if(doConfirm){
                        
-                await deleteDoc(doc(db, "students", stu.id)).then(()=>{
+                await deleteDoc(doc(db, "enrolled_students", stu.id)).then(()=>{
                         this.students.splice(stu, 1)
                 }).catch(()=>{
 

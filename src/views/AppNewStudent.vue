@@ -54,12 +54,13 @@
                                                 <label for="remark" class="small">Remark</label>
                                             </div>
                                             <div class="mb-3">
-                                                <button type="submit" class="btn btn-primary btn-lg" :class="{disabled: isLoading}">
+                                                <button type="submit" class="btn btn-primary btn-lg me-2" :class="{disabled: isLoading}">
                                                         <div class="spinner-border text-light spinner-border-sm" role="status" v-if="isLoading">
                                                             <span class="visually-hidden">Loading...</span>
                                                          </div>
                                                         Save
                                                     </button>
+                                                    <router-link to="/students" class="btn  float-end" :class="{disabled: isLoading}"><i class="fa-solid fa-users-line"></i> Students</router-link>
                                             </div>
                                         </form>
                                     </div>
@@ -87,7 +88,7 @@ export default {
             phone: "",
             course: "",
             course_fees: "",
-            deposit:"",
+            deposit:0,
             remark:"",
             errors: {
                 name: "",
@@ -201,12 +202,14 @@ export default {
             }else{
                 this.errors.course="";
             }
+            /*
             if(!this.deposit){
                     this.errors.deposit="The deposit  field is required.";
             }else{
                 this.errors.deposit="";
             }
-            if(!this.remark){
+            */
+             if(!this.remark){
                     this.errors.remark="The remark field is required.";
             }else{
                 this.errors.remark="";

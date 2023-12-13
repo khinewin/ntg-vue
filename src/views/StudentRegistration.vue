@@ -29,12 +29,16 @@
                                             <div class="mb-3">
                                                 <label  class="form-label small" > Training Course</label>
                                                 <div class="form-check">
-                                                    <input @click="clearError('course')" class="form-check-input" type="radio" :class="{'is-invalid' : errors.course}"  v-model="course" value="Web Development Programming Level - 1 " name="flexRadioDefault" id="flexRadioDefault1">
-                                                    <label class="form-check-label small" for="flexRadioDefault1">Web Development Programming Level - 1 </label>
+                                                    <input @click="clearError('course')" class="form-check-input" type="radio" :class="{'is-invalid' : errors.course}"  v-model="course" value="wdl1" name="flexRadioDefault" id="flexRadioDefault1">
+                                                    <label class="form-check-label small" for="flexRadioDefault1">Web Development  Level - 1 </label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="Web Development Programming Level - 2" name="flexRadioDefault" id="flexRadioDefault2" >
-                                                    <label class="form-check-label small" for="flexRadioDefault2">Web Development Programming Level - 2  </label>
+                                                    <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="wdl2" name="flexRadioDefault" id="flexRadioDefault2" >
+                                                    <label class="form-check-label small" for="flexRadioDefault2">Web Development  Level - 2  </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="wdl3" name="flexRadioDefault" id="flexRadioDefault3" >
+                                                    <label class="form-check-label small" for="flexRadioDefault3">Web Development  Level - 3  </label>
                                                 </div>
                                                 <span v-if="errors.course" class="text-danger small">{{ errors.course }}</span>
                                             </div>
@@ -65,10 +69,16 @@
                         <div class="modal-body">
                             <h6 class="text-center mb-5">သင်တန်းတက်ရန် စာရင်းသွင်းထားသော သင်၏အချက်အလက်မှာ အောက်ပါအတိုင်းဖြစ်ပါသည်။</h6>
                                 <table class="table table-borderless">
-                                    <tr><td>Name : </td><td>{{ student.name }}</td></tr>
-                                    <tr><td>Email : </td><td>{{ student.email }}</td></tr>
-                                    <tr><td>Phone : </td><td>{{ student.phone }}</td></tr>
-                                    <tr><td>Training course : </td><td>{{ student.course }}</td></tr>
+                                    <tr><td class="col-5">Name : </td><td>{{ student.name }}</td></tr>
+                                    <tr><td class="col-5">Email : </td><td>{{ student.email }}</td></tr>
+                                    <tr><td class="col-5">Phone : </td><td>{{ student.phone }}</td></tr>
+                                    <tr><td class="col-5">Training course : </td>
+                                        <td>
+                                            <span v-if="student.course==='wdl1'">Web Development Level - 1</span>
+                                            <span v-if="student.course==='wdl2'">Web Development Level - 2</span>
+                                            <span v-if="student.course==='wdl3'">Web Development Level - 3</span>
+                                        </td>
+                                    </tr>
 
                                 </table>
                             <div class=" d-grid mt-5">

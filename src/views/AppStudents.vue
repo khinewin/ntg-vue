@@ -42,6 +42,9 @@
                 </div>
                 <div class="card mb-4 shadow-sm">
                         <div class="card-body">
+                                <div class="row my-5"  v-if="!pageLoading && students.length <=0">
+                                        <div class="col-12 text-center"><i class="fa-solid fa-circle-info"></i> There are no result.</div>
+                                </div>
                                 <div class="row my-5" v-if="pageLoading">
                                         <div class="col-6">
                                                 <div class="spinner-grow text-success float-end" role="status">
@@ -64,10 +67,13 @@
                                                 </div>
                                         </div>
                                 </div>
-                                <ul class="list-group" v-for="stu in allStudents" :key="stu.id" v-else>
-                                    <li class="list-group-item list-group-item-action mb-2 shadow-sm border-5 border-end-0 border-top-0 border-bottom-0" :class="{ 'border-warning': stu.course_fees > stu.deposit, 'border-success': stu.deposit >= stu.course_fees}">
-                                            <div class="row">
-                                                
+                                <div v-for="bat in batchs" :key="bat" class="card shadow-sm mb-2" v-else>
+                                 <div class="card-body">
+                                <h5 class="card-title" @click="getStudentsByBatch(bat)">Batch #{{bat}}</h5>                                 
+                                <ul class="list-group" v-for="stu in allStudents" :key="stu.id" >
+                                    
+                                    <li v-if="bat===stu.batch"  class="list-group-item list-group-item-action mb-2 shadow-sm border-5 border-end-0 border-top-0 border-bottom-0" :class="{ 'border-warning': stu.course_fees > stu.deposit, 'border-success': stu.deposit >= stu.course_fees}">
+                                            <div class="row">                                                
                                                 <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">Name</div>
                                                         <div class="text-center small fw-semibold">{{stu.name}}</div>
@@ -109,13 +115,15 @@
                             </ul>
                         </div>
                 </div>
+                        </div>
+                </div>
             </div>
     </div>
    </div>
 </template>
 <script>
 import SideBar from './SideBar.vue';
-import { doc, setDoc, collection, addDoc, deleteDoc, query, getDocs,orderBy,startAt, endAt, getCountFromServer, sum, where } from "firebase/firestore"; 
+import { doc, setDoc, collection, addDoc, deleteDoc, query, getDocs,orderBy,startAt, endAt, getCountFromServer, sum, where, limit } from "firebase/firestore"; 
 import db from "../firebase"
 
 export default {
@@ -164,6 +172,7 @@ export default {
         clearSearchByName(){
                 this.search_by_name="";
                 this.fetchStudents();
+            
         },
         clearFilterByCourse(){
                 this.filter_by_course="";
@@ -172,6 +181,10 @@ export default {
         clearFilterByBatch(){
                 this.filter_by_batch="";
                 this.fetchStudents();
+        },
+        getStudentsByBatch(bat){
+               this.filter_by_batch=bat;
+               this.fetchStudents();
         },
         filterByBatch(){
                 this.fetchStudents();
@@ -225,7 +238,7 @@ export default {
             }
                   
             if(!this.filter_by_batch && !this.filter_by_course && !this.search_by_name){
-                 q = query(collection(db, "students"), where("batch", "==", this.current_batch), orderBy("created_at", "asc"));
+                 q = query(collection(db, "students"), orderBy("created_at", "asc"), limit(50));
             }
             
             const querySnapshot = await getDocs(q);

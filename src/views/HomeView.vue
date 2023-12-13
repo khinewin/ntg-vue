@@ -27,12 +27,41 @@
             <div v-for="post in posts" :key="post.id" class="col-sm-6 mb-4">
             <!--start col-->
               <div class="card shadow-sm border-0">
-                <img :src="post.src" class="card-img-top" :alt="post.title">
+                <vue-load-image>
+                    <template v-slot:image>
+                        <img :src="post.src" class="img-fluid"/>
+                    </template>
+                    <template v-slot:preloader> 
+                      <div class="row my-5" >
+                                        <div class="col-6">
+                                                <div class="spinner-grow text-success float-end" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                        </div>
+                                        <div class="col-6">
+                                                <div class="spinner-grow text-danger" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                        </div>
+                                        <div class="col-6">
+                                                <div class="spinner-grow text-warning float-end" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                        </div>
+                                        <div class="col-6">
+                                                <div class="spinner-grow text-info" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                        </div>
+                                </div>
+                    </template>
+                    <template v-slot:error>Image load fails</template>
+              </vue-load-image>
                 <div class="card-body">
                     <h4 class="card-title text-center mb-4">{{ post.title }}</h4>
                     <!-- <div v-html="post.text_body"></div> -->
                     <div class="d-grid">
-                      <button type="button" class="btn btn-primary" @click="viewDetails(post.id)"> <i class="fa-solid fa-angles-right"></i>  View Details</button>
+                      <button type="button" class="btn" @click="viewDetails(post.id)"> <i class="fa-solid fa-angles-right"></i>  View Details</button>
                     </div>
                 </div>
               </div>
@@ -47,6 +76,7 @@
   import { onMounted } from 'vue'
   import { collection, doc, setDoc, getDocs , query} from "firebase/firestore";
   import db from '../firebase'
+  import VueLoadImage from 'vue-load-image'
 
 export default {
         name: 'HomeView',
@@ -55,6 +85,9 @@ export default {
               showSpinner :false,
               posts : [],
           }
+        },
+        components: {
+          'vue-load-image': VueLoadImage
         },
 
         mounted(){
