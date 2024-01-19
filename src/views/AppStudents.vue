@@ -8,8 +8,8 @@
                 <div class="row my-2">
                         <div class="col-12">
                                 <div class="row">
-                                        <div class="col-sm-3">
-                                                <h4><i class="fa-solid fa-users-line"></i> Students</h4>
+                                        <div class="col-sm-3" >
+                                                <h4  @click="getAllStudents" ><i class="fa-solid fa-users-line"></i> Students</h4>
                                         </div>
                                         <div class="col-sm-3">
                                                <div class="input-group">
@@ -19,7 +19,7 @@
                                                                         <option value="Web Development Level - 2">WD L-2</option>
                                                                         <option value="Web Development Level - 3">WD L-3</option>
                                                                 </select>        
-                                                                <div class="input-group-text" @click=clearFilterByCourse><i class="fa-solid fa-circle-xmark d-block"></i></div>     
+                                                                <div class="input-group-text" @click=clearFilter><i class="fa-solid fa-circle-xmark d-block"></i></div>     
                                                </div>                                          
                                         </div>
                                         <div class="col-sm-3">
@@ -28,13 +28,13 @@
                                                                         <option value="">Filter by batch</option>
                                                                         <option v-for="b in batchs" :value="b">Batch #{{b}}</option>
                                                                 </select>        
-                                                                <div class="input-group-text" @click=clearFilterByBatch><i class="fa-solid fa-circle-xmark d-block"></i></div>     
+                                                                <div class="input-group-text" @click=clearFilter><i class="fa-solid fa-circle-xmark d-block"></i></div>     
                                                </div>                                          
                                         </div>
                                         <div class="col-sm-3">
                                                 <div class="input-group">
                                                         <input @keydown.enter="searchByName" type="search" class="form-control form-control-sm" id="search_by_name" placeholder="Search by name" v-model="search_by_name">
-                                                        <div class="input-group-text" @click=clearSearchByName><i class="fa-solid fa-circle-xmark d-block"></i></div>   
+                                                        <div class="input-group-text" @click=clearFilter><i class="fa-solid fa-circle-xmark d-block"></i></div>   
                                                 </div>  
                                         </div>
                                 </div>
@@ -42,9 +42,7 @@
                 </div>
                 <div class="card mb-4 shadow-sm">
                         <div class="card-body">
-                                <div class="row my-5"  v-if="!pageLoading && students.length <=0">
-                                        <div class="col-12 text-center"><i class="fa-solid fa-circle-info"></i> There are no result.</div>
-                                </div>
+                                
                                 <div class="row my-5" v-if="pageLoading">
                                         <div class="col-6">
                                                 <div class="spinner-grow text-success float-end" role="status">
@@ -69,7 +67,8 @@
                                 </div>
                                 <div v-for="bat in batchs" :key="bat" class="card shadow-sm mb-2" v-else>
                                  <div class="card-body">
-                                <h5 class="card-title" @click="getStudentsByBatch(bat)">Batch #{{bat}}</h5>                                 
+                                <h5 class="card-title" @click="getStudentsByBatch(bat)">Batch #{{bat}}</h5> 
+                                                             
                                 <ul class="list-group" v-for="stu in allStudents" :key="stu.id" >
                                     
                                     <li v-if="bat===stu.batch"  class="list-group-item list-group-item-action mb-2 shadow-sm border-5 border-end-0 border-top-0 border-bottom-0" :class="{ 'border-warning': stu.course_fees > stu.deposit, 'border-success': stu.deposit >= stu.course_fees}">
@@ -112,6 +111,7 @@
                                                 </div>
                                             </div>
                                     </li>
+                                   
                             </ul>
                         </div>
                 </div>
@@ -151,11 +151,14 @@ export default {
     computed:{
         allStudents(){
                 return this.students;
-        }
+        },
+    
+       
     },
     
     methods :{
 
+        
         async fetchBatch(){
             const q = query(collection(db, "training"), orderBy("batch", "asc"));
             const querySnapshot = await getDocs(q);
@@ -169,21 +172,19 @@ export default {
                 }
             })
         },
-        clearSearchByName(){
-                this.search_by_name="";
+
+        getAllStudents(){
+                this.clearFilter();
                 this.fetchStudents();
-            
         },
-        clearFilterByCourse(){
+        
+        clearFilter(){
                 this.filter_by_course="";
-                this.fetchStudents();
-        },
-        clearFilterByBatch(){
                 this.filter_by_batch="";
-                this.fetchStudents();
+                this.search_by_name="";
         },
-        getStudentsByBatch(bat){
-               this.filter_by_batch=bat;
+        getStudentsByBatch(bat){        
+                this.filter_by_batch=bat;
                this.fetchStudents();
         },
         filterByBatch(){
@@ -256,7 +257,8 @@ export default {
                 stu.created_at=doc.data().created_at;
                 stu.course_fees=doc.data().course_fees;
                 stu.batch=doc.data().batch;
-                this.students.unshift(stu);
+               
+               this.students.unshift(stu);
 
             })
             this.pageLoading=false;
@@ -281,6 +283,8 @@ export default {
     }
 }
 </script>
-<style lang="">
-    
+<style lang="css">
+    .change-cursor{
+        cursor:pointer;
+    }
 </style>

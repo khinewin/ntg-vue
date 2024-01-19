@@ -1,7 +1,7 @@
 <template>
-  <div class="home">
+  <div class="home min-vh-100">
         <div class="container mt-4">
-                                <div class="row my-5" v-if="showSpinner">
+                                <div class="row mt-5" v-if="showSpinner">
                                         <div class="col-6">
                                                 <div class="spinner-grow text-success float-end" role="status">
                                                 <span class="visually-hidden">Loading...</span>
@@ -60,8 +60,11 @@
                 <div class="card-body">
                     <h4 class="card-title text-center mb-4">{{ post.title }}</h4>
                     <!-- <div v-html="post.text_body"></div> -->
-                    <div class="d-grid">
-                      <button type="button" class="btn" @click="viewDetails(post.id)"> <i class="fa-solid fa-angles-right"></i>  View Details</button>
+                    <div class="row justify-content-center">
+                        <div class="col-sm-4">
+                                <button type="button" class="btn btn-secondary" @click="viewDetails(post.id)"> <i class="fa-solid fa-angles-right"></i>  Read more</button>
+
+                        </div>
                     </div>
                 </div>
               </div>

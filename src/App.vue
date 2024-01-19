@@ -1,4 +1,5 @@
 <template>
+
   <nav-bar :loginEmail="loginEmail" :loginUid="loginUid" :isAuthenticated="isAuthenticated"></nav-bar>
   
   <router-view/>
@@ -13,6 +14,7 @@
     import { getAuth,onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 
     export default{
+      
         components :{
           NavBar, 
           FooterBar,
@@ -22,6 +24,7 @@
                
             }
         },
+        
         mounted(){
             this.checkLogin();
       

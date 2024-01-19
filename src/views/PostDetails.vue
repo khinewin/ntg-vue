@@ -1,5 +1,7 @@
+
 <template>
-    <div class="home">
+   
+    <div class="home">     
           <div class="container mt-4">
             <div v-if="showSpinner" class="row">
                 <div class="col-12 text-center py-5">
@@ -32,11 +34,12 @@
   </template>
   
   <script>
-    import { onMounted } from 'vue'
     import { collection, doc, setDoc, getDoc , query} from "firebase/firestore";
     import db from '../firebase'
-  
-  export default {
+    
+  export default {        
+
+       
           name: 'PostDetails',
           data(){
             return {
@@ -45,7 +48,9 @@
                 id: this.$route.params.id,
             }
           },
-  
+        
+
+        
           mounted(){
             this.getPost();
           },

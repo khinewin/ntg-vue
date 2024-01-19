@@ -73,7 +73,7 @@
 </template>
 <script>
 import SideBar from '@/views/SideBar.vue'
-import { doc, setDoc, collection, query, getDocs, orderBy, addDoc, where } from "firebase/firestore"; 
+import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
 import db from "../firebase"
 
 export default {
@@ -128,18 +128,22 @@ export default {
                     if(this.course==="Web Development Level - 3"){
                         this.course_fees=250000;
                     }
-                    const saveCollection=collection(db, "students")
+
+                    const saveCollection=collection(db, "students", )
                     let saveData=await addDoc(saveCollection, {
-                        name: this.name,
-                        email: this.email,
-                        phone : this.phone,
-                        course: this.course,
-                        deposit: [this.deposit],
-                        created_at : new Date().toLocaleDateString() + ", " + new Date().toLocaleTimeString(),
-                        order_date: new Date(),
-                        remark : this.remark,
-                        course_fees: this.course_fees,
-                        batch: this.batch
+                        
+                        batch: this.batch,
+                        
+                            name: this.name,
+                            email: this.email,
+                            phone : this.phone,
+                            course: this.course,
+                            deposit: [this.deposit],
+                            created_at : new Date().toLocaleDateString() + ", " + new Date().toLocaleTimeString(),
+                            order_date: new Date(),
+                            remark : this.remark,
+                            course_fees: this.course_fees,
+                    
                         })
                     if(saveData.id){
                         this.isLoading=false;                      
@@ -153,7 +157,9 @@ export default {
                         
                         this.showSpinner=false;
                     }
-                }
+               
+                
+            }
         },
         clearError(error){
                 switch(error){

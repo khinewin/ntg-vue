@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp, Vue } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -14,5 +14,8 @@ dom.watch();
 import "../node_modules/bootstrap/dist/css/bootstrap.css"
 import * as bootstrap from 'bootstrap';
 window.bootstrap = bootstrap;
+
+
+
 
 createApp(App).use(store).use(router).component("font-awesome-icon", FontAwesomeIcon).mount('#app')
