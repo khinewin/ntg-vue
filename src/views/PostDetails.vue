@@ -21,34 +21,76 @@
                   <div class="card-body">
                       <h4 class="card-title text-center mb-4">{{ post.title }}</h4>
                       <div v-html="post.text_body"></div> 
-                      <div class="mt-4">
-                        <button type="button" class="btn btn-secondary" @click="goHome"><i class="fa-solid fa-house"></i>    Home</button>
+                      <div class="mt-4 row">
+                        <div class="col-6">
+                          <button type="button" class="btn btn-secondary" @click="goHome"><i class="fa-solid fa-house"></i>    Home</button>
+
+                        </div>
+                        <div class="col-6 d-grid">
+                              <button type="button" class="btn">
+                                <iframe :src="'https://www.facebook.com/plugins/share_button.php?href=https%3A%2F%2Fntgtechnology.web.app%2Fpost%2F'+id+'&layout&size&appId=291717897246348&width=80&height=20'" width="80" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>                 
+
+                              </button>
+                        </div>
                       </div>
-                  </div>
                 </div>
               <!--end col-->       
             </div> 
             </div>
           </div>
-    </div>
+           </div>
+           </div>
+
   </template>
   
   <script>
     import { collection, doc, setDoc, getDoc , query} from "firebase/firestore";
     import db from '../firebase'
-    
-  export default {        
+    import {computed, onMounted, onUpdated, getCurrentInstance,  } from 'vue'
+ import { useHead } from '@unhead/vue'
 
-       
+
+  export default {        
+              setup() {           
+              onUpdated(()=>{
+                      let ci= getCurrentInstance();
+                      let title=ci.data.post.title;
+                      let src=ci.data.post.src;
+                      let id=ci.data.id;
+                      if(id !== undefined){
+                         useHead({
+                          title: computed(() => title),
+                          meta: [
+                                    {
+                                      property: `og:title`,
+                                      content: computed(() => title),
+                                    },
+                                    {
+                                      property: `og:url`,
+                                      content: computed(() =>`https://ntgtechnology.web.app/post/${id}`),
+                                    },
+                                    {
+                                      property: `og:image`,
+                                      content: computed(() =>src),
+                                    },
+                                    ],
+                         })
+                      }
+                })
+                
+            
+            },
+    
           name: 'PostDetails',
           data(){
             return {
                 showSpinner :false,
                 post : {},
                 id: this.$route.params.id,
+                
             }
           },
-        
+       
 
         
           mounted(){
@@ -73,9 +115,7 @@
 
                 }
           },
-          computed: {
-  
-          }
+         
   }
   </script>
   

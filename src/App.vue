@@ -1,11 +1,12 @@
 <template>
 
-  <nav-bar :loginEmail="loginEmail" :loginUid="loginUid" :isAuthenticated="isAuthenticated"></nav-bar>
-  
-  <router-view/>
-  <div>
-    <footer-bar></footer-bar>
+
+  <nav-bar :loginEmail="loginEmail" :loginUid="loginUid" :isAuthenticated="isAuthenticated"></nav-bar>    
+  <div class="min-vh-100">
+    <router-view/>  
   </div>
+    <footer-bar></footer-bar>
+
 </template>
 <script>
     import NavBar  from "./views/NavBar.vue"

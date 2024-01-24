@@ -6,12 +6,14 @@
                 <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    
+                    <!--
                     <ul class="navbar-nav ms-auto me-auto mb-2 mb-lg-0" >
+                        
                         <li class="nav-item" >
                                 <router-link to="/student-registration" class="nav-link"><i class="fa-solid fa-id-card"></i> Student registration</router-link>
                         </li> 
                     </ul>
+                     -->
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                       
                         <li class="nav-item" v-if="!isAuthenticated">

@@ -15,7 +15,8 @@ import "../node_modules/bootstrap/dist/css/bootstrap.css"
 import * as bootstrap from 'bootstrap';
 window.bootstrap = bootstrap;
 
+import { createHead } from '@unhead/vue'
+const head = createHead()
 
 
-
-createApp(App).use(store).use(router).component("font-awesome-icon", FontAwesomeIcon).mount('#app')
+createApp(App).use(head).use(store).use(router).component("font-awesome-icon", FontAwesomeIcon).mount('#app')

@@ -4,11 +4,15 @@
             <div class="col-12">
                 <div class="row justify-content-center my-4">
                     <div class="col-sm-4">
+                       <div class="text-center my-5">
+                        <img src="../assets/ntg-logo.png" class="img-fluid" width="200px" alt="NTG TECHNOLOGY">
+
+                        <h5 class="text-secondary mt-2">Login</h5>
+                       </div>
+
                         <div class="card shadow-sm">
-                            <div class="card-body">
-                                    <h5 class="text-primary text-center">NTG Technology APP</h5>
-                                    <h6 class="text-secondary text-center">Login</h6>
-                                    <form class="mt-5" @submit.prevent="doSignin">
+                            <div class="card-body">                                    
+                                    <form  @submit.prevent="doSignin">
                                         <div v-if="login_msg" class="text-success text-center small">{{ login_msg }}</div>
 
                                         <div v-if="firebase_msg" class="text-danger text-center small">{{ firebase_msg }}</div>

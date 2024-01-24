@@ -1,6 +1,6 @@
 <template>
-  <div class="home min-vh-100">
-        <div class="container mt-4">
+  <div class="home ">
+        <div class="container mt-4 ">
                                 <div class="row mt-5" v-if="showSpinner">
                                         <div class="col-6">
                                                 <div class="spinner-grow text-success float-end" role="status">
@@ -76,12 +76,41 @@
 </template>
 
 <script>
-  import { onMounted } from 'vue'
+  import { onMounted, computed } from 'vue'
   import { collection, doc, setDoc, getDocs , query} from "firebase/firestore";
   import db from '../firebase'
   import VueLoadImage from 'vue-load-image'
+  import { useHead } from '@unhead/vue'
+
 
 export default {
+        setup() {           
+              onMounted(()=>{
+                      let title="NTG TECHNOLOGY";
+                      let src="/ntg-social-logo.png";
+                      if(title !== undefined){
+                         useHead({
+                          title: computed(() => title),
+                          meta: [
+                                    {
+                                      property: `og:title`,
+                                      content: computed(() => title),
+                                    },
+                                    {
+                                      property: `og:url`,
+                                      content: computed(() =>`https://ntgtechnology.web.app`),
+                                    },
+                                    {
+                                      property: `og:image`,
+                                      content: computed(() =>src),
+                                    },
+                                    ],
+                         })
+                      }
+                })
+                
+            
+            },
         name: 'HomeView',
         data(){
           return {
@@ -98,7 +127,7 @@ export default {
         },
        
         methods:{
-          viewDetails(id){
+          viewDetails(id){            
                this.$router.push(`post/${id}`)
           },
            async getContents(){    
