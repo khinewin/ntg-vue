@@ -38,7 +38,6 @@
                                                         <option value="">Select course</option>
                                                         <option>Web Development Level - 1</option>
                                                         <option>Web Development Level - 2</option>
-                                                        <option>Web Development Level - 3</option>
                                                 </select>
                                                 <label for="course" class="small">Course</label>
                                             </div>
@@ -120,13 +119,10 @@ export default {
                 if(!this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.course && !this.errors.deposit && !this.errors.remark){
                     this.isLoading=true;
                     if(this.course==="Web Development Level - 1"){
-                        this.course_fees=150000;
+                        this.course_fees=200000;
                     }else
                      if(this.course==="Web Development Level - 2"){
-                        this.course_fees=250000;
-                    }else
-                    if(this.course==="Web Development Level - 3"){
-                        this.course_fees=250000;
+                        this.course_fees=200000;
                     }
 
                     const saveCollection=collection(db, "students", )

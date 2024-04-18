@@ -34,11 +34,19 @@
                                                     Signin
                                                 </button>
                                             </div>
-                                    </form>
-                            </div>
+                                    </form>                                    
+                            </div>                          
+
                         </div>
+                        <div class="text-center mt-4">
+                            <button type="button" class="btn ml-5" @click="goHome"><i class="fa-solid fa-house"></i>    Home</button>
+
+                        </div>
+
                     </div>
+                    
                 </div>
+              
             </div>
         </div>
     </div>
@@ -66,7 +74,9 @@ export default {
 
     
     methods: {
-
+        goHome(){
+                this.$router.push("/")
+            },
         
         doSignin(){
             this.checkValidataion();

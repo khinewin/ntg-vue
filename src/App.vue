@@ -1,10 +1,10 @@
 <template>
 
 
-  <nav-bar :loginEmail="loginEmail" :loginUid="loginUid" :isAuthenticated="isAuthenticated"></nav-bar>    
-  <div class="min-vh-100">
-    <router-view/>  
-  </div>
+    <nav-bar :loginEmail="loginEmail" :loginUid="loginUid" :isAuthenticated="isAuthenticated"></nav-bar>    
+
+    <router-view class="min-vh-100"/>  
+
     <footer-bar></footer-bar>
 
 </template>

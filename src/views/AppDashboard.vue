@@ -18,7 +18,8 @@
                                                 <hr>
                                                 <div>
                                                         <button class="btn  me-2"><i class="fa-solid fa-angles-right"></i> Details</button>
-                                                        <button class="btn  float-md-end"><i class="fa-solid fa-circle-plus"></i> Add post</button>
+                                                        <router-link to="/add/post" class="btn  float-md-end"><i class="fa-solid fa-circle-plus"></i> Add post</router-link>
+
                                                 </div>
                                         </div>
                                 </div>

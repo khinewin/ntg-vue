@@ -36,10 +36,7 @@
                                                     <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="wdl2" name="flexRadioDefault" id="flexRadioDefault2" >
                                                     <label class="form-check-label small" for="flexRadioDefault2">Web Development  Level - 2  </label>
                                                 </div>
-                                                <div class="form-check">
-                                                    <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="wdl3" name="flexRadioDefault" id="flexRadioDefault3" >
-                                                    <label class="form-check-label small" for="flexRadioDefault3">Web Development  Level - 3  </label>
-                                                </div>
+                                               
                                                 <span v-if="errors.course" class="text-danger small">{{ errors.course }}</span>
                                             </div>
                                             <div class="mb-5">
@@ -67,20 +64,22 @@
                     </div>
                     <div v-else>
                         <div class="modal-body">
-                            <h6 class="text-center mb-5">သင်တန်းတက်ရန် စာရင်းသွင်းထားသော သင်၏အချက်အလက်မှာ အောက်ပါအတိုင်းဖြစ်ပါသည်။</h6>
+                            <h5 class="text-center text-success mb-2">Registration successful.</h5>
+                            <h6 class="text-center mb-4 mt-4 lh-base">သင်တန်းတက်ရန် စာရင်းသွင်းထားသော သင်၏အချက်အလက်မှာ အောက်ပါအတိုင်းဖြစ်ပါသည်။</h6>
                                 <table class="table table-borderless">
                                     <tr><td class="col-5">Name : </td><td>{{ student.name }}</td></tr>
                                     <tr><td class="col-5">Email : </td><td>{{ student.email }}</td></tr>
                                     <tr><td class="col-5">Phone : </td><td>{{ student.phone }}</td></tr>
                                     <tr><td class="col-5">Training course : </td>
-                                        <td>
-                                            <span v-if="student.course==='wdl1'">Web Development Level - 1</span>
-                                            <span v-if="student.course==='wdl2'">Web Development Level - 2</span>
-                                            <span v-if="student.course==='wdl3'">Web Development Level - 3</span>
-                                        </td>
+                                            <td v-if="student.course==='wdl1'">Web Development Level - 1</td>
+                                            <td v-if="student.course==='wdl2'">Web Development Level - 2</td>
+                                     
                                     </tr>
 
                                 </table>
+                            <p>
+                                အသေးစိတ်သိရှိလိုသည်များကို ဖုန်းနံပါတ် : <a href="tel:09970488345">09970488345</a> သို့ဆက်သွယ်ပြီးစုံစမ်းနိုင်ပါသည်။
+                            </p>
                             <div class=" d-grid mt-5">
                                 <button type="button" @click="cancelRegData" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
@@ -165,6 +164,7 @@ export default {
         },
 
         async submitRegister(){
+         //   this.toggleLoadingModal("show");
            
             this.checkValidataion();
             if(!this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.education && !this.errors.course){

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory, createMemoryHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import PostDetails from "../views/PostDetails.vue"
 import StudentRegistration from '@/views/StudentRegistration.vue'
@@ -9,6 +9,7 @@ import EnrolledStudentsVue from '@/views/EnrolledStudents.vue'
 import AppStudents from "@/views/AppStudents.vue"
 import AppNewStudent from "@/views/AppNewStudent.vue"
 import AppEditStudent from '@/views/AppEditStudent.vue'
+import AddPostVue from '@/views/AddPost.vue'
 
 const routes = [
   {
@@ -64,6 +65,12 @@ const routes = [
     component: AppEditStudent,
     name: "AppEditStudent",
     meta : {requiresAuth :false}
+  },
+  {
+    path: "/add/post", 
+    component: AddPostVue,
+    name: "AddPost",
+    meta : {requiresAuth :false}
   }
 ]
 
@@ -71,7 +78,7 @@ const routes = [
 
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+   history: createWebHistory(),
     routes
 })
 

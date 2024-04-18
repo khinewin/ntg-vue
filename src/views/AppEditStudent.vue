@@ -153,12 +153,15 @@ export default {
                 if(!this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.course && !this.errors.deposit && !this.errors.remark){
                     this.isLoading=true;
                     const saveDoc=doc(db, "students", this.id)
+                  
+                    
+                    
                     await setDoc(saveDoc, {
                         name: this.name,
                         email: this.email,
                         phone : this.phone,
                         course: this.course,
-                        deposit: this.deposit ? [...this.old_deposit, this.deposit] : this.old_deposit,
+                        deposit: this.deposit ?  [...this.old_deposit, this.deposit] : this.old_deposit,
                        created_at : this.created_at,
                         remark : this.remark,
                         order_date: this.order_date,
@@ -175,6 +178,7 @@ export default {
                         .catch(()=>{
 
                         })
+                        
                    
                 }
         },
@@ -231,6 +235,14 @@ export default {
             }else{
                 this.errors.remark="";
             }
+            const old_deposit=this.old_deposit.reduce((accu, cur)=> accu + cur)
+            const new_deposit=Number(old_deposit) + Number(this.deposit)
+            if(new_deposit > this.course_fees){
+                        this.errors.deposit="Invalid deposit amount.";
+                        this.deposit=""
+             }else{
+                this.errors.deposit=""
+             }
         },
         validEmail:function(email) {
             var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
