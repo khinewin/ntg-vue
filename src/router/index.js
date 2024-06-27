@@ -10,6 +10,9 @@ import AppStudents from "@/views/AppStudents.vue"
 import AppNewStudent from "@/views/AppNewStudent.vue"
 import AppEditStudent from '@/views/AppEditStudent.vue'
 import AddPostVue from '@/views/AddPost.vue'
+import AppIncomeStatement from '@/views/AppIncomeStatement.vue'
+import AppSpendingTask from '@/views/AppSpendingTask.vue'
+import AppRevenueTask from '@/views/AppRevenueTask.vue'
 
 const routes = [
   {
@@ -70,6 +73,24 @@ const routes = [
     path: "/add/post", 
     component: AddPostVue,
     name: "AddPost",
+    meta : {requiresAuth :false}
+  },
+  {
+    path: "/income-statement", 
+    component: AppIncomeStatement,
+    name: "IncomeStatement",
+    meta : {requiresAuth :false}
+  },
+  {
+    path: "/spanding-task", 
+    component: AppSpendingTask,
+    name: "AppSpendingTask",
+    meta : {requiresAuth :false}
+  },
+  {
+    path: "/revenue-task", 
+    component: AppRevenueTask,
+    name: "AppRevenueTask",
     meta : {requiresAuth :false}
   }
 ]

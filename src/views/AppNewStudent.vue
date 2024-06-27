@@ -36,10 +36,19 @@
                                             <div class="form-floating mb-3">
                                                 <select class="form-select form-select-sm" id="course" @click="clearError('course')" v-model="course" :class="{'is-invalid' : errors.course}">
                                                         <option value="">Select course</option>
+                                                        <option>Programming Basic (From Zero To Moderate)</option>
                                                         <option>Web Development Level - 1</option>
                                                         <option>Web Development Level - 2</option>
                                                 </select>
                                                 <label for="course" class="small">Course</label>
+                                            </div>
+                                            <div class="text-danger small ms-2 mb-2" v-if="errors.batch">{{errors.batch}}</div>
+                                            <div class="form-floating mb-3">
+                                                <select class="form-select form-select-sm" id="batch" @click="clearError('batch')" v-model="batch" :class="{'is-invalid' : errors.batch}">
+                                                    <option value="">Select Batch</option>    
+                                                    <option v-for="b in batchs" :key="bb">{{b}}</option>
+                                                </select>
+                                                <label for="batch" class="small">Batch</label>
                                             </div>
                                             <div class="text-danger small ms-2 mb-2" v-if="errors.deposit">{{errors.deposit}}</div>
                                             <div class="mb-3 form-floating">
@@ -87,6 +96,7 @@ export default {
             phone: "",
             course: "",
             course_fees: "",
+            teacherFees:0,
             deposit:0,
             remark:"",
             errors: {
@@ -96,9 +106,11 @@ export default {
                 course: "",
                 deposit: "",
                 remark:"",
+                batch:"",
             },
             isLoading: false,
-            batch:{},
+            batch: "",
+            batchs:[]
         }
     },
     mounted(){
@@ -106,29 +118,36 @@ export default {
     },
     methods:{
        async fetchBatch(){
-            const q = query(collection(db, "training"), where("active", "==", true));
+            const q = query(collection(db, "training"));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
                 let batch={};   
                 batch=doc.data().batch;
-                this.batch=batch;
+                this.batchs.unshift(batch);
             })
         },
         async saveStudent(){
                 this.checkValidation();
-                if(!this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.course && !this.errors.deposit && !this.errors.remark){
+                if(!this.errors.batch && !this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.course && !this.errors.deposit && !this.errors.remark){
                     this.isLoading=true;
                     if(this.course==="Web Development Level - 1"){
                         this.course_fees=200000;
+                        this.teacherFees=0.70;
                     }else
                      if(this.course==="Web Development Level - 2"){
                         this.course_fees=200000;
+                        this.teacherFees=0.70;
+                    }
+                    else
+                     if(this.course==="Programming Basic (From Zero To Moderate)"){
+                        this.course_fees=100000;
+                        this.teacherFees=0.70;
                     }
 
                     const saveCollection=collection(db, "students", )
                     let saveData=await addDoc(saveCollection, {
                         
-                        batch: this.batch,
+                        batch: Number(this.batch),
                         
                             name: this.name,
                             email: this.email,
@@ -139,6 +158,7 @@ export default {
                             order_date: new Date(),
                             remark : this.remark,
                             course_fees: this.course_fees,
+                            teacherFees : this.teacherFees
                     
                         })
                     if(saveData.id){
@@ -176,6 +196,9 @@ export default {
                             break;      
                         case "remark":
                             this.errors.remark="";
+                            break;  
+                            case "batch":
+                            this.errors.batch="";
                             break;        
                 }
         },
@@ -204,13 +227,13 @@ export default {
             }else{
                 this.errors.course="";
             }
-            /*
-            if(!this.deposit){
-                    this.errors.deposit="The deposit  field is required.";
+            
+            if(!this.batch){
+                    this.errors.batch="The batch  field is required.";
             }else{
-                this.errors.deposit="";
+                this.errors.batch="";
             }
-            */
+            
              if(!this.remark){
                     this.errors.remark="The remark field is required.";
             }else{

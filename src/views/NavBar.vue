@@ -1,7 +1,7 @@
 <template>
         <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="#!" ><router-link to="/"><img src="../assets/ntg-logo.png" width="160" alt="NTG TECHNOLOGY"></router-link></a>
+                <a class="navbar-brand py-0" href="#!" ><router-link to="/"><img src="../assets/ntg-logo.png" width="60" class="py-0" alt="NTG TECHNOLOGY"></router-link></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
                 </button>

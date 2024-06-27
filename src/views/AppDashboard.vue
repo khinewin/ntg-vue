@@ -13,7 +13,7 @@
                 <div class="row my-2">
                         <div class="col-sm-4 mb-3">
                                 <div class="card shadow-sm">
-                                        <div class="card-body bg-secondary-subtle">
+                                        <div class="card-body bg-primary-subtle">
                                                 <h4 class="card-title  py-5">Posts <span class="badge text-bg-primary ">{{postCount}}</span></h4>
                                                 <hr>
                                                 <div>
@@ -26,7 +26,7 @@
                         </div>
                         <div class="col-sm-8 mb-3">
                                 <div class="card shadow-sm">
-                                        <div class="card-body bg-secondary-subtle">
+                                        <div class="card-body bg-warning-subtle">
                                                 <h4 class="card-title  py-5">Enrolled students <span class="badge text-bg-primary ">{{studentRegistrationCount}}</span></h4>
                                                 <hr>
                                                 <div >
@@ -38,12 +38,23 @@
                         </div>
                         <div class="col-sm-8 mb-3">
                                 <div class="card shadow-sm">
-                                        <div class="card-body bg-secondary-subtle">
+                                        <div class="card-body bg-success-subtle">
                                                 <h4 class="card-title  py-5">Students <span class="badge text-bg-primary ">{{studentsCount}}</span></h4>
                                                 <hr>
                                                 <div >
                                                         <router-link to="/students" class="btn  me-2"> <i class="fa-solid fa-angles-right"></i> Details</router-link>
                                                         <router-link to="/new-student" class="btn  float-md-end"><i class="fa-solid fa-circle-plus"></i> Add student</router-link>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
+                        <div class="col-sm-4 mb-3">
+                                <div class="card shadow-sm">
+                                        <div class="card-body bg-info-subtle">
+                                                <h4 class="card-title  py-5">Income Statement </h4>
+                                                <hr>
+                                                <div >
+                                                        <router-link to="/income-statement" class="btn  me-2"> <i class="fa-solid fa-angles-right"></i> Details</router-link>
                                                 </div>
                                         </div>
                                 </div>

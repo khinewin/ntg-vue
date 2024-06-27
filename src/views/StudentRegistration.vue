@@ -29,6 +29,10 @@
                                             <div class="mb-3">
                                                 <label  class="form-label small" > Training Course</label>
                                                 <div class="form-check">
+                                                    <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="pb" name="flexRadioDefault" id="flexRadioDefault3" >
+                                                    <label class="form-check-label small" for="flexRadioDefault3">Programming Basic (From Zero To Moderate) </label>
+                                                </div>
+                                                <div class="form-check">
                                                     <input @click="clearError('course')" class="form-check-input" type="radio" :class="{'is-invalid' : errors.course}"  v-model="course" value="wdl1" name="flexRadioDefault" id="flexRadioDefault1">
                                                     <label class="form-check-label small" for="flexRadioDefault1">Web Development  Level - 1 </label>
                                                 </div>
@@ -73,6 +77,7 @@
                                     <tr><td class="col-5">Training course : </td>
                                             <td v-if="student.course==='wdl1'">Web Development Level - 1</td>
                                             <td v-if="student.course==='wdl2'">Web Development Level - 2</td>
+                                            <td v-if="student.course==='pb'">Programming Basic (From Zero To Moderate)</td>
                                      
                                     </tr>
 

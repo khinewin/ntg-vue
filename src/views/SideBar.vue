@@ -6,6 +6,7 @@
             <li class="list-group-item"><router-link to="/students" class="nav-link"><i class="fa-solid fa-users-line"></i> Students</router-link></li>
             <li class="list-group-item"><router-link to="/new-student" class="nav-link"><i class="fa-solid fa-user-plus"></i> Add student</router-link></li>
             <li class="list-group-item"><router-link to="/add/post" class="nav-link"><i class="fa-solid fa-plus-circle"></i> Add post</router-link></li>
+            <li class="list-group-item"><router-link to="/income-statement" class="nav-link"><i class="fa-solid fa-money-bill-transfer"></i> Income Statement</router-link></li>
 
         </ul>
    </div>

@@ -5,7 +5,7 @@
                 <div class="row justify-content-center my-4">
                     <div class="col-sm-4">
                        <div class="text-center my-5">
-                        <img src="../assets/ntg-logo.png" class="img-fluid" width="200px" alt="NTG TECHNOLOGY">
+                        <img src="../assets/ntg-logo.png" class="img-fluid" width="100px" alt="NTG TECHNOLOGY">
 
                         <h5 class="text-secondary mt-2">Login</h5>
                        </div>
