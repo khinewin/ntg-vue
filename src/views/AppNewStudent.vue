@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="container-fluid">
+    <div class="container-fluid home">
     <div class="row">
             <div class="col-md-2 d-none d-md-block sidebar-block">
                     <SideBar></SideBar>
@@ -11,7 +11,7 @@
                         </div>
                 </div>
                 
-                 <div class="card shadow-sm mb-4">
+                 <div class="card shadow-sm mb-2">
                         <div class="card-body">
                             <div class="row my-2 justify-content-center">
                                  <div class="col-sm-6">                             
@@ -34,11 +34,17 @@
                                             </div>
                                             <div class="text-danger small ms-2 mb-2" v-if="errors.course">{{errors.course}}</div>
                                             <div class="form-floating mb-3">
+                                                <!--
                                                 <select class="form-select form-select-sm" id="course" @click="clearError('course')" v-model="course" :class="{'is-invalid' : errors.course}">
                                                         <option value="">Select course</option>
                                                         <option>Programming Basic (From Zero To Moderate)</option>
                                                         <option>Web Development Level - 1</option>
                                                         <option>Web Development Level - 2</option>
+                                                </select>
+                                                -->
+                                                <select @click="clearError('course')" class="form-select form-select-sm"  :class="{'is-invalid' : errors.course}" v-model="course">
+                                                    <option value="">Select  course</option>
+                                                    <option v-for="sc in select_course" :key="sc.id" :value="sc.code">{{sc.course}}</option>
                                                 </select>
                                                 <label for="course" class="small">Course</label>
                                             </div>
@@ -99,6 +105,15 @@ export default {
             teacherFees:0,
             deposit:0,
             remark:"",
+            select_course: [
+                    {id: 1, course : "Computer Technology, CT - 1", code: "ct1"},
+                    {id: 2, course : "Computer Technology, CT - 2", code: "ct2"},
+                    {id: 3, course : "Programming Basic (From Zero To Moderate)", code: "pb1"},
+                    {id: 4, course : "Web Development Level - 1", code: "wd1"},
+                    {id: 5, course : "Web Development Level - 2", code: "wd2"},                   
+                    {id: 6, course : "Basic Coding & Programming For Kids Level -1", code :"bcpkid1"},
+                    {id: 7, course : "Basic Coding & Programming For Kids Level -2", code :"bcpkid2"},
+            ],
             errors: {
                 name: "",
                 email: "",
@@ -130,19 +145,62 @@ export default {
                 this.checkValidation();
                 if(!this.errors.batch && !this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.course && !this.errors.deposit && !this.errors.remark){
                     this.isLoading=true;
-                    if(this.course==="Web Development Level - 1"){
-                        this.course_fees=200000;
-                        this.teacherFees=0.70;
-                    }else
-                     if(this.course==="Web Development Level - 2"){
+
+                    switch(this.course){
+                        case "wd1":
+                            this.course_fees=200000;
+                            this.teacherFees=0.70;
+                        break;
+                        case "wd2":
+                            this.course_fees=200000;
+                            this.teacherFees=0.70;
+                        break;
+                        case "bcpkid1":
+                            this.course_fees=150000;
+                            this.teacherFees=0.70;
+                        break;
+                        case "bcpkid2":
+                            this.course_fees=150000;
+                            this.teacherFees=0.70;
+                        break;
+                        case "ct1":
+                            this.course_fees=70000;
+                            this.teacherFees=0.70;
+                        break;
+                        case "ct2":
+                            this.course_fees=200000;
+                            this.teacherFees=0.70;
+                        break;
+                        case "pb1":
+                            this.course_fees=100000;
+                            this.teacherFees=0.70;
+                        break;
+
+                    }
+                    /*
+                    if(this.course==="wd1"){
                         this.course_fees=200000;
                         this.teacherFees=0.70;
                     }
-                    else
-                     if(this.course==="Programming Basic (From Zero To Moderate)"){
+                     if(this.course==="wd2"){
+                        this.course_fees=200000;
+                        this.teacherFees=0.70;
+                    }
+                    
+                    if(this.course==="pb1"){
                         this.course_fees=100000;
                         this.teacherFees=0.70;
                     }
+
+                    if(this.course==="ct1"){
+                        this.course_fees=70000;
+                        this.teacherFees=0.70;
+                    }
+                    if(this.course==="ct2"){
+                        this.course_fees=200000;
+                        this.teacherFees=0.70;
+                    }
+                    */
 
                     const saveCollection=collection(db, "students", )
                     let saveData=await addDoc(saveCollection, {
@@ -170,7 +228,7 @@ export default {
                         this.course="";
                         this.deposit="";
                         this.remark="";
-                        
+                        this.teacherFees=0;
                         this.showSpinner=false;
                     }
                

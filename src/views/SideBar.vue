@@ -8,6 +8,8 @@
             <li class="list-group-item"><router-link to="/add/post" class="nav-link"><i class="fa-solid fa-plus-circle"></i> Add post</router-link></li>
             <li class="list-group-item"><router-link to="/income-statement" class="nav-link"><i class="fa-solid fa-money-bill-transfer"></i> Income Statement</router-link></li>
 
+            <li class="list-group-item"><router-link to="/shared-statement" class="nav-link"><i class="fa-brands fa-creative-commons-share"></i> Shared Statement</router-link></li>
+
         </ul>
    </div>
 </template>

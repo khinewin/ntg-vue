@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="container-fluid">
+    <div class="container-fluid home">
     <div class="row">
             <div class="col-md-2 d-none d-md-block sidebar-block">
                     <SideBar></SideBar>
@@ -53,7 +53,7 @@
                                                     <td>Teacher </td>
                                                     <td>Myo Htet (40%)</td>
                                                     <td>Father (40%)</td>
-                                                    <td>Khaing Win (20%)</td>
+                                                    <td>NTG (20%)</td>
                                                 </tr>
                                                 <tr>
                                                     <td>{{totalTrainingRevenue}}</td>
@@ -91,7 +91,7 @@
                         </div>
                     </div>
                 </div>
-                 <div class="card shadow-sm mb-4">
+                 <div class="card shadow-sm mb-2">
                         <div class="card-body p-1">
                             <div class="row gx-1">
                                 <div class="col-sm-4">                             
@@ -277,10 +277,12 @@ export default {
                 task.name=doc.data().name;
                 task.id=doc.id;
                 task.teacherFees=doc.data().teacherFees * task.deposit;        
-                this.trainingRevenueTasks.unshift(task);
+                
                this.totalTrainingRevenue += task.deposit;
                this.teacherRevenue += task.teacherFees;
                 this.totalProfitRevenue = this.totalTrainingRevenue - this.teacherRevenue;
+
+                this.trainingRevenueTasks.unshift(task);
             })
             this.isLoading=false;
         }, 

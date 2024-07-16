@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid">
+    <div class="container-fluid home">
         <div class="row">
             <div class="col-12">
                 <div class="row justify-content-center my-4">
@@ -7,15 +7,17 @@
                        <div class="text-center my-5">
                         <img src="../assets/ntg-logo.png" class="img-fluid" width="100px" alt="NTG TECHNOLOGY">
 
-                        <h5 class="text-secondary mt-2">Login</h5>
+                        <h5 class="text-secondary mt-2" v-if="!isAuth">Login</h5>
+                       </div>
+                       <div class="mb-2">
+                            <div v-if="login_msg" class="text-success text-center small">{{ login_msg }}</div>
+                            <div v-if="firebase_msg" class="text-danger text-center small">{{ firebase_msg }}</div>
                        </div>
 
-                        <div class="card shadow-sm">
+                        <div class="card shadow-sm" v-if="!isAuth">
                             <div class="card-body">                                    
                                     <form  @submit.prevent="doSignin">
-                                        <div v-if="login_msg" class="text-success text-center small">{{ login_msg }}</div>
-
-                                        <div v-if="firebase_msg" class="text-danger text-center small">{{ firebase_msg }}</div>
+                                        
                                             <div class="mb-3">
                                                 <label for="email" class="form-label">E-mail</label>
                                                 <input type="email" class="form-control" id="email" v-model="email"  :class="{'is-invalid' : errors.email}">
@@ -37,6 +39,21 @@
                                     </form>                                    
                             </div>                          
 
+                        </div>
+                        <div class="card" v-if="isAuth">
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><router-link to="/dashboard" class="nav-link"><i class="fa-solid fa-earth-americas"></i> Dashboard</router-link></li>
+                                    <li class="list-group-item" ><router-link to="/enrolled-students" class="nav-link"><i class="fa-solid fa-users"></i> Enrolled students</router-link></li>
+                                    <li class="list-group-item"><router-link to="/students" class="nav-link"><i class="fa-solid fa-users-line"></i> Students</router-link></li>
+                                    <li class="list-group-item"><router-link to="/new-student" class="nav-link"><i class="fa-solid fa-user-plus"></i> Add student</router-link></li>
+                                    <li class="list-group-item"><router-link to="/add/post" class="nav-link"><i class="fa-solid fa-plus-circle"></i> Add post</router-link></li>
+                                    <li class="list-group-item"><router-link to="/income-statement" class="nav-link"><i class="fa-solid fa-money-bill-transfer"></i> Income Statement</router-link></li>
+                        
+                                    <li class="list-group-item"><router-link to="/shared-statement" class="nav-link"><i class="fa-brands fa-creative-commons-share"></i> Shared Statement</router-link></li>
+                        
+                                </ul>
+                            </div>
                         </div>
                         <div class="text-center mt-4">
                             <button type="button" class="btn ml-5" @click="goHome"><i class="fa-solid fa-house"></i>    Home</button>
@@ -72,7 +89,11 @@ export default {
         }
     },
 
-    
+    computed:{
+        isAuth(){
+            return this.$store.getters.isAuthenticated;
+        }
+    },
     methods: {
         goHome(){
                 this.$router.push("/")
@@ -93,7 +114,7 @@ export default {
                     setTimeout(() => {
                         this.isLoading=false;
                         this.login_msg="";
-                        this.$router.push("dashboard")
+                       // this.$router.push("dashboard")
                     }, 2000);
                 })
                 .catch((rej)=>{

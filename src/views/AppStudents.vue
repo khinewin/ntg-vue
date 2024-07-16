@@ -1,5 +1,5 @@
 <template lang="">
-   <div class="container-fluid">
+   <div class="container-fluid home">
     <div class="row">
             <div class="col-md-2 d-none d-md-block">
                     <SideBar></SideBar>
@@ -40,7 +40,7 @@
                                 </div>
                         </div>
                 </div>
-                <div class="card mb-4 shadow-sm">
+                <div class="card mb-2 shadow-sm">
                         <div class="card-body">
                                 
                                 <div class="row my-5" v-if="pageLoading">

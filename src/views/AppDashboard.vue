@@ -1,5 +1,5 @@
 <template lang="">
-        <div class="container-fluid">
+        <div class="container-fluid mb-2 home">
     <div class="row">
             <div class="col-md-2 d-none d-md-block">
                     <SideBar></SideBar>
@@ -10,8 +10,8 @@
                                 <h4><i class="fa-solid fa-earth-americas"></i> Dashboard</h4>
                         </div>
                 </div>
-                <div class="row my-2">
-                        <div class="col-sm-4 mb-3">
+                <div class="row g-2">
+                        <div class="col-sm-4">
                                 <div class="card shadow-sm">
                                         <div class="card-body bg-primary-subtle">
                                                 <h4 class="card-title  py-5">Posts <span class="badge text-bg-primary ">{{postCount}}</span></h4>
@@ -24,7 +24,7 @@
                                         </div>
                                 </div>
                         </div>
-                        <div class="col-sm-8 mb-3">
+                        <div class="col-sm-8">
                                 <div class="card shadow-sm">
                                         <div class="card-body bg-warning-subtle">
                                                 <h4 class="card-title  py-5">Enrolled students <span class="badge text-bg-primary ">{{studentRegistrationCount}}</span></h4>
@@ -36,7 +36,7 @@
                                         </div>
                                 </div>
                         </div>
-                        <div class="col-sm-8 mb-3">
+                        <div class="col-sm-4">
                                 <div class="card shadow-sm">
                                         <div class="card-body bg-success-subtle">
                                                 <h4 class="card-title  py-5">Students <span class="badge text-bg-primary ">{{studentsCount}}</span></h4>
@@ -48,7 +48,18 @@
                                         </div>
                                 </div>
                         </div>
-                        <div class="col-sm-4 mb-3">
+                        <div class="col-sm-4">
+                                <div class="card shadow-sm">
+                                        <div class="card-body bg-secondary-subtle">
+                                                <h4 class="card-title  py-5">Shared Statement </h4>
+                                                <hr>
+                                                <div >
+                                                        <router-link to="/shared-statement" class="btn  me-2"> <i class="fa-solid fa-angles-right"></i> Details</router-link>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
+                        <div class="col-sm-4">
                                 <div class="card shadow-sm">
                                         <div class="card-body bg-info-subtle">
                                                 <h4 class="card-title  py-5">Income Statement </h4>

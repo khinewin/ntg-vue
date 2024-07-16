@@ -53,16 +53,16 @@
                   </div>
                 </div>
               </template>
-              <template v-slot:error>Image load fails</template>
+              <template v-slot:error>Loading image failed.</template>
             </vue-load-image>
             <!--  <img :src="post.src" class="card-img-top" :alt="post.title"> -->
-            <div class="card-body px-5">
+            <div class="card-body">
               <h4 class="card-title text-center mb-4 fw-bold">
                 {{ post.title }}
               </h4>
-              <div v-html="post.text_body" class="text-wrap lh-lg"></div>
+              <div v-html="post.content" class="text-wrap lh-lg"></div>
               <div class="mt-4 row">
-                <div class="col-6">
+                <div class="col-3">
                   <button
                     type="button"
                     class="btn text-primary"
@@ -71,11 +71,20 @@
                     <i class="fa-solid fa-house"></i> Home
                   </button>
                 </div>
+                <div class="col-3">
+                  <button
+                    type="button"
+                    class="btn "
+                    @click="goArticles"
+                  >
+                  <i class="fa-regular fa-newspaper"></i> Articles
+                  </button>
+                </div>
                 <div class="col-6 d-grid">
                   <button type="button" class="btn">
                     <iframe
                       :src="
-                        'https://www.facebook.com/plugins/share_button.php?href=https%3A%2F%2Fntgtechnology.web.app%2Fpost%2F' +
+                        'https://www.facebook.com/plugins/share_button.php?href=https%3A%2F%2Fntgtechnology.web.app%2Farticle%2F' +
                         id +
                         '&layout&size&appId=291717897246348&width=80&height=20'
                       "
@@ -125,7 +134,7 @@ export default {
               property: `og:url`,
               content: computed(
                 () =>
-                  `https://ntgtechnology.web.app/post/${id}?title=${title}&img_url=${src}`
+                  `https://ntgtechnology.web.app/article/${id}?title=${title}&img_url=${src}`
               ),
             },
             {
@@ -138,7 +147,7 @@ export default {
     });
   },
 
-  name: "PostDetails",
+  name: "ArticleDetails",
   components: {
     "vue-load-image": VueLoadImage,
   },
@@ -160,13 +169,16 @@ export default {
     goHome() {
       this.$router.push("/");
     },
+    goArticles(){
+      this.$router.push("/articles");
+    },
     async getPost() {
       this.showSpinner = true;
-      const docRef = doc(db, "contents", this.id);
+      const docRef = doc(db, "articles", this.id);
       const docSnap = await getDoc(docRef);
       let post = {
         title: docSnap.data().title,
-        text_body: docSnap.data().text_body,
+        content: docSnap.data().content,
         src: docSnap.data().src,
       };
       this.post = post;

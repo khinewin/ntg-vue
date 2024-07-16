@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="container-fluid">
+    <div class="container-fluid home">
     <div class="row">
             <div class="col-md-2 d-none d-md-block sidebar-block">
                     <SideBar></SideBar>
@@ -11,7 +11,7 @@
                         </div>
                 </div>
                 
-                 <div class="card shadow-sm mb-4">
+                 <div class="card shadow-sm mb-2">
                         <div class="card-body">
                             <div class="row my-2 justify-content-center">
                                  <div class="col-sm-6">                             

@@ -13,12 +13,28 @@ import AddPostVue from '@/views/AddPost.vue'
 import AppIncomeStatement from '@/views/AppIncomeStatement.vue'
 import AppSpendingTask from '@/views/AppSpendingTask.vue'
 import AppRevenueTask from '@/views/AppRevenueTask.vue'
+import AppSharedStatement from '@/views/AppSharedStatement.vue'
+import AppArticles from '@/views/AppArticles.vue'
+import ArticleDetails from '@/views/ArticleDetails.vue'
 
 const routes = [
   {
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/articles',
+    name: 'AppArticles',
+    component: AppArticles
+  },
+  {
+    path: '/article/:id',
+    name: 'ArticleDetails',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: ArticleDetails,
   },
   {
     path: '/post/:id',
@@ -43,55 +59,61 @@ const routes = [
     path: "/dashboard",
     component: AppDashboard,
     name: "AppDashboard",
-    meta : {requiresAuth : false}
+    meta : {requiresAuth : true}
   },
   {
     path: "/enrolled-students",
     component: EnrolledStudentsVue,
     name: "EnrolledStudents",
-    meta : {requiresAuth : false}
+    meta : {requiresAuth : true}
   },
   {
     path: "/students",
     component: AppStudents,
     name: "AppStudents",
-    meta : {requiresAuth : false}
+    meta : {requiresAuth : true}
   },
   {
     path: "/new-student",
     component: AppNewStudent,
     name: "AppNewStudent",
-    meta : {requiresAuth : false}
+    meta : {requiresAuth : true}
   },
   {
     path: "/edit-student/:id", 
     component: AppEditStudent,
     name: "AppEditStudent",
-    meta : {requiresAuth :false}
+    meta : {requiresAuth :true}
   },
   {
     path: "/add/post", 
     component: AddPostVue,
     name: "AddPost",
-    meta : {requiresAuth :false}
+    meta : {requiresAuth :true}
   },
   {
     path: "/income-statement", 
     component: AppIncomeStatement,
     name: "IncomeStatement",
-    meta : {requiresAuth :false}
+    meta : {requiresAuth :true}
   },
   {
     path: "/spanding-task", 
     component: AppSpendingTask,
     name: "AppSpendingTask",
-    meta : {requiresAuth :false}
+    meta : {requiresAuth :true}
   },
   {
     path: "/revenue-task", 
     component: AppRevenueTask,
     name: "AppRevenueTask",
-    meta : {requiresAuth :false}
+    meta : {requiresAuth :true}
+  },
+  {
+    path: "/shared-statement", 
+    component: AppSharedStatement,
+    name: "AppSharedStatement",
+    meta : {requiresAuth :true}
   }
 ]
 

@@ -1,5 +1,5 @@
 <template lang="">
-     <div class="container-fluid">
+     <div class="container-fluid home">
     <div class="row">
             <div class="col-md-2 d-none d-md-block">
                     <SideBar></SideBar>
@@ -60,9 +60,13 @@
                                                 <div class="col-sm-6 col-md-3 mb-2">
                                                         <div class="text-center small fw-light">Course</div>
                                                         <div class="text-center small fw-semibold">
-                                                                <span v-if="stu.course==='wdl1'">Web Development Level - 1</span>
-                                                                <span v-if="stu.course==='wdl2'">Web Development Level - 2</span>
-                                                                <span v-if="stu.course==='wdl3'">Web Development Level - 3</span>
+                                                                <span v-if="stu.course==='wd1'">Web Development Level - 1</span>
+                                                                <span v-if="stu.course==='wd2'">Web Development Level - 2</span>
+                                                                <span v-if="stu.course==='ct1'">Computer Technology, CT - 1</span>
+                                                                <span v-if="stu.course==='ct2'">Computer Technology, CT - 2</span>
+                                                                <span v-if="stu.course==='pb1'">Programming Basic (From Zero To Moderate)</span>
+                                                                <span v-if="stu.course==='bcpkid1'">Basic Coding & Programming For Kids Level -1</span>
+                                                                <span v-if="stu.course==='bcpkid2'">Basic Coding & Programming For Kids Level -2</span>
                                                         </div>
                                                 </div>
                                                 <div class="col-sm-6 col-md-3 mb-2">

@@ -1,7 +1,7 @@
 <template>
-    <div class="container">
+    <div class="container home">
             <div class="row justify-content-center">
-                <div class="col-sm-6 my-4">
+                <div class="col-sm-6 mt-2 mb-4">
                         <div class="card shadow-sm">
                             <div class="card-body">
                                         <h5 class="text-center text-dark  mb-5">Student Registration Form</h5>
@@ -28,19 +28,10 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label  class="form-label small" > Training Course</label>
-                                                <div class="form-check">
-                                                    <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="pb" name="flexRadioDefault" id="flexRadioDefault3" >
-                                                    <label class="form-check-label small" for="flexRadioDefault3">Programming Basic (From Zero To Moderate) </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input @click="clearError('course')" class="form-check-input" type="radio" :class="{'is-invalid' : errors.course}"  v-model="course" value="wdl1" name="flexRadioDefault" id="flexRadioDefault1">
-                                                    <label class="form-check-label small" for="flexRadioDefault1">Web Development  Level - 1 </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input @click="clearError('course')" class="form-check-input" type="radio"  :class="{'is-invalid' : errors.course}" v-model="course" value="wdl2" name="flexRadioDefault" id="flexRadioDefault2" >
-                                                    <label class="form-check-label small" for="flexRadioDefault2">Web Development  Level - 2  </label>
-                                                </div>
-                                               
+                                                <select @click="clearError('course')" class="form-select"  :class="{'is-invalid' : errors.course}" v-model="course">
+                                                        <option value="">Select the course</option>
+                                                        <option v-for="sc in select_course" :key="sc.id" :value="sc.code">{{sc.course}}</option>
+                                                </select>                                               
                                                 <span v-if="errors.course" class="text-danger small">{{ errors.course }}</span>
                                             </div>
                                             <div class="mb-5">
@@ -75,9 +66,13 @@
                                     <tr><td class="col-5">Email : </td><td>{{ student.email }}</td></tr>
                                     <tr><td class="col-5">Phone : </td><td>{{ student.phone }}</td></tr>
                                     <tr><td class="col-5">Training course : </td>
-                                            <td v-if="student.course==='wdl1'">Web Development Level - 1</td>
-                                            <td v-if="student.course==='wdl2'">Web Development Level - 2</td>
-                                            <td v-if="student.course==='pb'">Programming Basic (From Zero To Moderate)</td>
+                                            <td v-if="student.course==='wd1'">Web Development Level - 1</td>
+                                            <td v-if="student.course==='wd2'">Web Development Level - 2</td>
+                                            <td v-if="student.course==='ct1'">Computer Technology, CT - 1</td>
+                                            <td v-if="student.course==='ct2'">Computer Technology, CT - 2</td>
+                                            <td v-if="student.course==='pb1'">Programming Basic (From Zero To Moderate)</td>
+                                            <td v-if="student.course==='bcpkid1'">Basic Coding & Programming For Kids Level -1</td>
+                                            <td v-if="student.course==='bcpkid2'">Basic Coding & Programming For Kids Level -1</td>
                                      
                                     </tr>
 
@@ -108,6 +103,15 @@ export default {
             email: "",
             phone:"",
             education:"",
+            select_course: [
+                    {id: 1, course : "Computer Technology, CT - 1", code: "ct1"},
+                    {id: 2, course : "Computer Technology, CT - 2", code: "ct2"},
+                    {id: 3, course : "Programming Basic (From Zero To Moderate)", code: "pb1"},
+                    {id: 4, course : "Web Development Level - 1", code: "wd1"},
+                    {id: 5, course : "Web Development Level - 2", code: "wd2"},                   
+                    {id: 6, course : "Basic Coding & Programming For Kids Level -1", code :"bcpkid1"},
+                    {id: 7, course : "Basic Coding & Programming For Kids Level -2", code :"bcpkid2"},
+            ],
             course: "",
             errors: {
                 name: "",
