@@ -16,6 +16,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore()
+let db = getFirestore()
 export default db
 
+//,{useFetchStreams: true}

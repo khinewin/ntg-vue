@@ -1,22 +1,27 @@
 <template lang="">
     <div class="container-fluid home">
     <div class="row">
-            <div class="col-md-2 d-none d-md-block sidebar-block">
-                    <SideBar></SideBar>
-            </div>
-            <div class="col-md-10 content-block" style="min-height: 500px">
+         
+            <div class="col-md-12 content-block" style="min-height: 500px">
+            
                 <div class="row my-2">
-                        <div class="col-12">
-                                <div class="row">
-                                    <div class="col-4">
-                                        <h4><i class="fa-solid fa-money-bill-transfer"></i> Revenue Task</h4>
-                                    </div>
-                                    <div class="col-4">
-                                        <router-link to="/income-statement" class="btn btn-link"> Income Statement</router-link>
-                                    </div>
-                                </div>
+                    <SideBar />  
+                        <div class="col-2 col-md-1">                                                             
+                                <a href="#!" class="ms-2 d-block circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-label="Toggle navigation">
+                                    <span class="text-dark">
+                                    <i class="fa-solid fa-bars"></i>
+                                    </span>
+                                </a> 
                         </div>
+                        <div class="col-10 col-md-3">                   
+                            <h4 class="h4">Spending Task</h4>
+                        </div>
+                        
+                         <div class="col-12 col-md-4">
+                              <router-link to="/admin/income-statement" class="btn btn-link"> Income Statement</router-link>
+                         </div>
                 </div>
+                
                 
                  <div class="card shadow-sm mb-4">
                         <div class="card-body">
@@ -54,14 +59,14 @@
    </div>
 </template>
 <script>
-import SideBar from '@/views/SideBar.vue'
+import SideBar from "@/views/admin/partials/SideBar.vue"
 import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
-import db from "../firebase"
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-  import CKEditor from "@ckeditor/ckeditor5-vue"
+import db from "@/firebase"
+
+  import { Timestamp } from "firebase/firestore";
 
 export default {
-    name : "AppRevenueTask",
+    name : "AppSpendingTask",
     components: {
         SideBar,
     },
@@ -88,9 +93,9 @@ export default {
 
            if(!this.errors.task_at && !this.errors.task_name && !this.errors.amount){
             this.isLoading=true;
-            let new_task_at=new Date(this.task_at).toDateString();
-            
-            const saveCollection=collection(db, "revenue_task", )
+            let new_task_at=Timestamp.fromDate(new Date(this.task_at));
+
+            const saveCollection=collection(db, "spending_task", )
                     let saveData=await addDoc(saveCollection, {  
                         task_name: this.task_name,
                         amount: this.amount, 
@@ -102,9 +107,7 @@ export default {
                         this.amount="",
                         this.isLoading=false;
                     }
-                        
            }
-            
         },
         checkValidation(){
             if(!this.task_name){

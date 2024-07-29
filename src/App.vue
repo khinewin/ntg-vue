@@ -10,8 +10,10 @@
   <footer-bar></footer-bar>
 </template>
 <script>
-import NavBar from "./views/NavBar.vue";
-import FooterBar from "./views/FooterBar.vue";
+import NavBar from "@/views/partials/NavBar.vue";
+import FooterBar from "@/views/partials/FooterBar.vue";
+import { doc, setDoc, getDoc, collection, where, addDoc,limit, query, getDocs, startAfter,orderBy, getCountFromServer } from "firebase/firestore"; 
+  import db from "@/firebase"
 
 import {
   getAuth,
@@ -28,8 +30,15 @@ export default {
     return {};
   },
 
-  mounted() {
+  created(){
+    this.getContentsCount();
     this.checkLogin();
+  },
+
+  updated(){
+  },
+  mounted() {   
+
   },
 
   computed: {
@@ -45,6 +54,27 @@ export default {
   },
 
   methods: {
+    async getContentsCount(){
+      const posts = query(collection(db, "contents"));
+      let postsSnap = await getCountFromServer(posts); 
+
+      const articles = query(collection(db, "articles"));
+      let articlesSnap = await getCountFromServer(articles); 
+
+      const students = query(collection(db, "students"));
+      let studentsSnap = await getCountFromServer(students); 
+
+      const enrolled = query(collection(db, "enrolled_students"));
+      let enrolledSnap = await getCountFromServer(enrolled); 
+
+      this.$store.dispatch("setContentsCount", {
+        posts: postsSnap.data().count, 
+        articles: articlesSnap.data().count,
+        students : studentsSnap.data().count,
+        enrolledStudents: enrolledSnap.data().count,
+      })
+    },
+
     checkLogin() {
       const auth = getAuth();
       onAuthStateChanged(auth, (user) => {

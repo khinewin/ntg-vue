@@ -1,22 +1,25 @@
 <template lang="">
     <div class="container-fluid home">
     <div class="row">
-            <div class="col-md-2 d-none d-md-block sidebar-block">
-                    <SideBar></SideBar>
-            </div>
-            <div class="col-md-10 content-block" style="min-height: 500px">
+          
+            <div class="col-md-12 content-block" style="min-height: 500px">
                 <div class="row my-2">
-                        <div class="col-12">
-                                <div class="row">
-                                    <div class="col-4">
-                                        <h4><i class="fa-brands fa-creative-commons-share"></i> Shared Statement</h4>
-                                    </div>
-                                 
-                                </div>
+                    <SideBar />  
+                        <div class="col-2 col-md-1">                                                             
+                                <a href="#!" class="ms-2 d-block circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-label="Toggle navigation">
+                                    <span class="text-dark">
+                                    <i class="fa-solid fa-bars"></i>
+                                    </span>
+                                </a> 
                         </div>
+                        <div class="col-10 col-md-4">                   
+                            <h4 class="h4 pt-1"> Shared statement</h4>
+                        </div>
+                     
                 </div>
-                <div class="row my-2 gx-1">
-                    <div class="col-6">
+                
+                <div class="row my-2 g-1">
+                    <div class="col-md-6">
                         <div class="card mb-2">
                             <div class="card-body p-0">
                                     <table class="table table-bordered mb-0 small">
@@ -99,7 +102,7 @@
                             </div>
                          </div>
                 </div>
-                <div class="col-6">
+                <div class="col-md-6">
                         <div class="card">
                             <div class="card-header">Making Payment</div>
                             <div class="card-body">
@@ -158,9 +161,9 @@
    </div>
 </template>
 <script>
-import SideBar from '@/views/SideBar.vue'
+import SideBar from "@/views/admin/partials/SideBar.vue"
 import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where ,deleteDoc, updateDoc, getDocFromCache} from "firebase/firestore"; 
-import db from "../firebase"
+import db from "@/firebase"
 
 export default {
     name : "AppSharedStatement",
@@ -199,9 +202,11 @@ export default {
         }
     },
 
-    mounted() {
-        this.fetchBatch();      
-        
+    created() {
+        this.$watch(()=>this.$route,
+        this.fetchBatch,
+        {immediate:true}
+    )        
     },
 
     computed:{

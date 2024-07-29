@@ -1,15 +1,26 @@
 <template lang="">
      <div class="container-fluid home">
     <div class="row">
-            <div class="col-md-2 d-none d-md-block">
-                    <SideBar></SideBar>
-            </div>
-            <div class="col-md-10" style="min-height: 500px">
+           
+            <div class="col-md-12" style="min-height: 500px">
                 <div class="row my-2">
-                        <div class="col-12">
-                                <h4><i class="fa-solid fa-users"></i> Enrolled students</h4>
-                        </div>
-                </div>
+                        <SideBar />  
+                            <div class="col-2 col-md-1">                                                             
+                                    <a href="#!" class="ms-2 d-block circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-label="Toggle navigation">
+                                        <span class="text-dark">
+                                        <i class="fa-solid fa-bars"></i>
+                                        </span>
+                                    </a> 
+                            </div>
+                            <div class="col-10 col-md-4">                   
+                                <h4 class="h4 pt-1"> Enrolled students</h4>
+                            </div>
+                            
+                            <div class="col-md-7">
+                                    <h4 v-if="message" class="text-success text-center h4 pt-1"><i class="fa-solid fa-check"></i> {{message}}</h4>
+                            </div>
+                    </div>
+                    
                 <div class="card shadow-sm my-2">
                     <div class="card-body">
                         <div class="row my-5"  v-if="!pageLoading && students.length <=0">
@@ -89,9 +100,9 @@
      </div>
 </template>
 <script>
-import SideBar from './SideBar.vue';
+import SideBar from "@/views/admin/partials/SideBar.vue"
 import { doc, setDoc, collection, addDoc, deleteDoc, query, getDocs,orderBy, getCountFromServer } from "firebase/firestore"; 
-import db from "../firebase"
+import db from "@/firebase"
 export default {
     name : "EnrolledStudents",
     components: {
@@ -103,8 +114,12 @@ export default {
                 pageLoading: true
         }
     },
-    mounted(){
-        this.fetchStudents();
+    created(){
+        this.$watch(()=>this.$route,
+        this.fetchStudents,
+        {immediate:true}
+        )
+       // this.fetchStudents();
     },
     methods:{
         callPhone(phone){

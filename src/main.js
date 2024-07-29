@@ -13,15 +13,21 @@ import { far } from '@fortawesome/free-regular-svg-icons';
 library.add(fas, far, fab)
 dom.watch();
 
-import "../node_modules/bootstrap/dist/css/bootstrap.css"
+
+import 'ckeditor5/ckeditor5.css';
+//import "../node_modules/bootstrap/dist/css/bootstrap.css"
+import 'bootstrap/dist/css/bootstrap.min.css'
+
 import * as bootstrap from 'bootstrap';
 window.bootstrap = bootstrap;
+
 
 import { createHead } from '@unhead/vue'
 const head = createHead()
 
 
 createApp(App)
+
 .use(head)
 .use(store)
 .use(router)

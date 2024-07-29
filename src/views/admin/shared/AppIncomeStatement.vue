@@ -1,27 +1,32 @@
 <template lang="">
     <div class="container-fluid home">
     <div class="row">
-            <div class="col-md-2 d-none d-md-block sidebar-block">
-                    <SideBar></SideBar>
-            </div>
-            <div class="col-md-10 content-block" style="min-height: 500px">
+           
+            <div class="col-md-12 content-block" style="min-height: 500px">
                 <div class="row my-2">
-                        <div class="col-12">
-                                <div class="row">
-                                    <div class="col-4">
-                                        <h4><i class="fa-solid fa-money-bill-transfer"></i> Income Statement</h4>
-                                    </div>
-                                    <div class="col-4">
-                                        <router-link to="/spanding-task" class="btn btn-link">  Spending Task</router-link>
-                                    </div>
-                                    <div class="col-4">
-                                        <router-link to="/revenue-task" class="btn btn-link">  Revenue Task</router-link>
-                                    </div>
-                                </div>
+                    <SideBar />  
+                        <div class="col-2 col-md-1">                                                             
+                                <a href="#!" class="ms-2 d-block circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-label="Toggle navigation">
+                                    <span class="text-dark">
+                                    <i class="fa-solid fa-bars"></i>
+                                    </span>
+                                </a> 
                         </div>
-                </div>
-                <div class="row my-2 gx-1">
-                    <div class="col-8">
+                        <div class="col-10 col-md-3">                   
+                            <h4 class="h4 pt-1">Income Statement</h4>
+                        </div>                  
+       
+                
+                        <div class="col-6 col-md-4">
+                               <router-link to="/admin/spanding-task" class="btn btn-link">  Spending Task</router-link>
+                         </div>
+                         <div class="col-6 col-md-4">
+                                <router-link to="/admin/revenue-task" class="btn btn-link">  Revenue Task</router-link>
+                         </div>
+                             
+                  </div>
+                <div class="row my-2 g-1">
+                    <div class="col-md-8">
                         <div class="card">
                             <div class="card-body p-0">
                                     <table class="table table-bordered mb-0 small">
@@ -40,12 +45,13 @@
                                                         </select>
                                                 </td>
                                                 <td>
-                                                    <button type="button" @click="filterStudent" class="btn btn-primary btn-sm"  :class="{disabled: isLoading}">
+                                                    <button type="button" @click="filterStudent" class="btn btn-sm btn-outline-primary"  :class="{disabled: isLoading}">
                                                         <div class="spinner-border text-light spinner-border-sm" role="status" v-if="isLoading">
                                                             <span class="visually-hidden">Loading...</span>
                                                          </div>
-                                                        Filter</button>
-                                                        <button class="btn btn-sm" @click="clearFilter">Clear</button>
+                                                        Filter
+                                                    </button>
+                                                        <button class="btn btn-sm btn-outline-warning" @click="clearFilter">Clear</button>
                                                 </td>
                                             </tr>
                                                 <tr>
@@ -67,7 +73,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-md-4">
                         <div class="card">
                             <div class="card-body p-0">                               
                                 <table class="table table-bordered  mb-0">
@@ -93,8 +99,8 @@
                 </div>
                  <div class="card shadow-sm mb-2">
                         <div class="card-body p-1">
-                            <div class="row gx-1">
-                                <div class="col-sm-4">                             
+                            <div class="row g-1">
+                                <div class="col-sm-6 col-md-4">                             
                                     <div class="card shadow">
                                         <div class="card-header bg-primary">Training Revenue</div>
                                         <div class="card-body table-responsive p-0">
@@ -119,14 +125,14 @@
                                     </div>
                                 
                                 </div>
-                                 <div class="col-sm-4">                             
+                                 <div class="col-sm-6 col-md-4" >                             
                                         <div class="card shadow">
                                             <div class="card-header bg-success">Revenue Tasks</div>
                                             <div class="card-body table-responsive p-0">
                                                 <table class="table table-bordered table-success mb-0">
                                                     <tbody v-for="r in revenueTasks" :key="r.id">
                                                         <tr class="small" >
-                                                            <td>{{r.task_at}}</td>
+                                                            <td>{{showTime(r.task_at)}}</td>
                                                             <td>{{r.task_name}}</td>
                                                             <td class="text-end">{{r.task_amount}}</td>
                                                             
@@ -143,14 +149,14 @@
                                         </div>
                                     
                                     </div>
-                                    <div class="col-sm-4">                             
+                                    <div class="col-sm-6 col-md-4">                             
                                         <div class="card shadow">
                                             <div class="card-header bg-warning">Spending Tasks</div>
                                             <div class="card-body table-responsive p-0">
                                                 <table class="table table-bordered table-warning mb-0">
                                                     <tbody v-for="s in spendingTasks" :key="s.id">
                                                         <tr class="small" >
-                                                            <td>{{s.task_at}}</td>
+                                                            <td>{{showTime(s.task_at)}}</td>
                                                             <td>{{s.task_name}}</td>
                                                             <td class="text-end">{{s.task_amount}}</td>
                                                             
@@ -177,11 +183,10 @@
    </div>
 </template>
 <script>
-import SideBar from '@/views/SideBar.vue'
+import SideBar from "@/views/admin/partials/SideBar.vue"
 import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
-import db from "../firebase"
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-  import CKEditor from "@ckeditor/ckeditor5-vue"
+import db from "@/firebase"
+
 
 export default {
     name : "AppIncomeStatement",
@@ -190,6 +195,8 @@ export default {
     },
     data(){
         return {
+            showSpinner:false,
+            error:null,
             isLoading:false,
            spendingTasks :[],
            revenueTasks:[],
@@ -207,11 +214,22 @@ export default {
         }
     },
 
-    mounted() {
-        this.fetchBatch();
-        this.fetchSpendingTask()
-        this.fetchRevenueTask();
-       // this.fetchTrainingRevenueTask();
+    created() {
+        this.$watch(()=>this.$route,
+        this.fetchBatch,       
+        {immediate:true}
+        ),
+        this.$watch(()=>this.$route,
+        this.fetchSpendingTask,       
+        {immediate:true}
+        ),
+        this.$watch(()=>this.$route,
+        this.fetchRevenueTask,       
+        {immediate:true}
+        )
+       // this.fetchBatch();
+        //this.fetchSpendingTask()
+        //this.fetchRevenueTask();
         
     },
 
@@ -223,6 +241,13 @@ export default {
     },
    
     methods:{  
+        showTime(t){
+            const date=t.toDate()
+           const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+            return formattedDate;
+        },
+        
         clearFilter(){
             this.batch="";
             this.course="";
@@ -254,8 +279,7 @@ export default {
         },
 
       
-        async fetchTrainingRevenueTask(){
-           
+        async fetchTrainingRevenueTask(){           
             let q="";
             if(this.batch && this.course){
                  q = query(collection(db, "students"), where("batch", "==", Number(this.batch)), where("course", "==", this.course));
@@ -287,7 +311,7 @@ export default {
             this.isLoading=false;
         }, 
         async fetchSpendingTask(){
-            const q = query(collection(db, "spending_task"), orderBy("task_at", "desc"));
+            const q = query(collection(db, "spending_task"), orderBy("task_at"));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
                 let task={};   
@@ -301,7 +325,7 @@ export default {
             })
         },
         async fetchRevenueTask(){
-            const q = query(collection(db, "revenue_task"), orderBy("task_at", "desc"));
+            const q = query(collection(db, "revenue_task"), orderBy("task_at"));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
                 let task={};   

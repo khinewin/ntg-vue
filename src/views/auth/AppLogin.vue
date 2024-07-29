@@ -3,9 +3,9 @@
         <div class="row">
             <div class="col-12">
                 <div class="row justify-content-center my-4">
-                    <div class="col-sm-4">
-                       <div class="text-center my-5">
-                        <img src="../assets/ntg-logo.png" class="img-fluid" width="100px" alt="NTG TECHNOLOGY">
+                    <div class="col-sm-10 col-md-8 col-lg-4">
+                       <div class="text-center  mb-2">
+                        <img src="@/assets/ntg-logo.png" class="img-fluid" width="100px" alt="NTG TECHNOLOGY">
 
                         <h5 class="text-secondary mt-2" v-if="!isAuth">Login</h5>
                        </div>
@@ -14,7 +14,7 @@
                             <div v-if="firebase_msg" class="text-danger text-center small">{{ firebase_msg }}</div>
                        </div>
 
-                        <div class="card shadow-sm" v-if="!isAuth">
+                        <div class="card shadow-sm" v-show="!isAuth">
                             <div class="card-body">                                    
                                     <form  @submit.prevent="doSignin">
                                         
@@ -25,8 +25,18 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label for="password" class="form-label">Password</label>
-                                                <input type="password" class="form-control" id="password" v-model="password" :class="{'is-invalid' : errors.password}">
-                                                <span v-if="errors.password" class="text-danger small">{{ errors.password }}</span>
+                                                <div class="input-group">
+                                                    <input :type="isShowPassword ? 'text' : 'password' " class="form-control" id="password" v-model="password" :class="{'is-invalid' : errors.password}">
+                                                            <span class="input-group-text" @click="handleShowPassword">
+                                                                <span   v-show="isShowPassword">
+                                                                    <i class="fa-solid fa-eye-slash"></i>
+                                                                </span>
+                                                                <span  v-show="!isShowPassword">
+                                                                    <i class="fa-solid fa-eye"></i>                                                        
+                                                                </span>
+                                                            </span>
+                                                    <span v-if="errors.password" class="text-danger small">{{ errors.password }}</span>
+                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <button type="submit" class="btn btn-primary" :class="{disabled: isLoading}">
@@ -40,25 +50,31 @@
                             </div>                          
 
                         </div>
-                        <div class="card" v-if="isAuth">
+                        <div class="card" v-show="isAuth">
                             <div class="card-body">
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item"><router-link to="/dashboard" class="nav-link"><i class="fa-solid fa-earth-americas"></i> Dashboard</router-link></li>
-                                    <li class="list-group-item" ><router-link to="/enrolled-students" class="nav-link"><i class="fa-solid fa-users"></i> Enrolled students</router-link></li>
-                                    <li class="list-group-item"><router-link to="/students" class="nav-link"><i class="fa-solid fa-users-line"></i> Students</router-link></li>
-                                    <li class="list-group-item"><router-link to="/new-student" class="nav-link"><i class="fa-solid fa-user-plus"></i> Add student</router-link></li>
-                                    <li class="list-group-item"><router-link to="/add/post" class="nav-link"><i class="fa-solid fa-plus-circle"></i> Add post</router-link></li>
-                                    <li class="list-group-item"><router-link to="/income-statement" class="nav-link"><i class="fa-solid fa-money-bill-transfer"></i> Income Statement</router-link></li>
+                                    <li class="list-group-item list-group-item-action bg-secondary text-white"><router-link to="/" class="nav-link"><i class="fa-solid fa-house"></i> Home</router-link></li>
+       
+                                    <li class="list-group-item bg-secondary text-white"><router-link to="/admin/dashboard" class="nav-link"><i class="fa-solid fa-earth-americas"></i> Dashboard</router-link></li>
+                                    <li class="list-group-item bg-secondary text-white" ><router-link to="/admin/enrolled-students" class="nav-link"><i class="fa-solid fa-users"></i> Enrolled students <span class="badge rounded-pill bg-dark float-end">{{enrolledStudents}}</span></router-link></li>
+                                    <li class="list-group-item bg-secondary text-white"><router-link to="/admin/new-student" class="nav-link"><i class="fa-solid fa-user-plus"></i> Add student</router-link></li>
+                 
+                                    <li class="list-group-item bg-secondary text-white"><router-link to="/admin/students" class="nav-link"><i class="fa-solid fa-users-line"></i> Students <span class="badge rounded-pill bg-dark float-end">{{studentsCount}}</span></router-link></li>
+                                    <li class="list-group-item bg-secondary text-white"><router-link to="/admin/courses/new" class="nav-link"><i class="fa-solid fa-plus-circle"></i> Add Course</router-link></li>
+                                    <li class="list-group-item bg-secondary text-white"><router-link to="/admin/courses" class="nav-link"><i class="fa-solid fa-network-wired"></i> Courses <span class="badge rounded-pill bg-dark float-end">{{postsCount}}</span></router-link></li>
+
+                                    <li class="list-group-item bg-secondary text-white"><router-link to="/admin/articles/new" class="nav-link"><i class="fa-solid fa-file-circle-plus"></i> Add Article</router-link></li>
+                                    <li class="list-group-item bg-secondary text-white"><router-link to="/admin/articles" class="nav-link"><i class="fa-solid fa-pen-nib"></i> Articles <span class="badge rounded-pill bg-dark float-end">{{articlesCount}}</span></router-link></li>
                         
-                                    <li class="list-group-item"><router-link to="/shared-statement" class="nav-link"><i class="fa-brands fa-creative-commons-share"></i> Shared Statement</router-link></li>
+                                    <li class="list-group-item bg-secondary text-white"><router-link to="/admin/income-statement" class="nav-link"><i class="fa-solid fa-money-bill-transfer"></i> Income Statement</router-link></li>
+                        
+                        
+                                    <li class="list-group-item bg-secondary text-white"><router-link to="/admin/shared-statement" class="nav-link"><i class="fa-brands fa-creative-commons-share"></i> Shared Statement</router-link></li>
                         
                                 </ul>
                             </div>
                         </div>
-                        <div class="text-center mt-4">
-                            <button type="button" class="btn ml-5" @click="goHome"><i class="fa-solid fa-house"></i>    Home</button>
-
-                        </div>
+                    
 
                     </div>
                     
@@ -70,7 +86,7 @@
 </template>
 <script>
 import { getAuth,onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
-import store from "../store"
+import store from "@/store"
 
 export default {
     name : "AppLogin",
@@ -85,16 +101,34 @@ export default {
             firebase_msg: "",
             login_msg:"",
             isLoading: false,
+            isShowPassword: false,
             
         }
     },
 
     computed:{
+    
+      postsCount(){
+        return this.$store.getters.postsCount;
+      },
+      articlesCount(){
+        return this.$store.getters.articlesCount;
+      },
+      studentsCount(){
+        return this.$store.getters.studentsCount;
+      },
+      enrolledStudents(){
+        return this.$store.getters.enrolledStudents;
+      },
+
         isAuth(){
             return this.$store.getters.isAuthenticated;
         }
     },
     methods: {
+        handleShowPassword(){
+            this.isShowPassword = !this.isShowPassword;
+        },
         goHome(){
                 this.$router.push("/")
             },

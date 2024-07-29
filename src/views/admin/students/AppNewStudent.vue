@@ -1,15 +1,26 @@
 <template lang="">
     <div class="container-fluid home">
     <div class="row">
-            <div class="col-md-2 d-none d-md-block sidebar-block">
-                    <SideBar></SideBar>
-            </div>
-            <div class="col-md-10 content-block" style="min-height: 500px">
+          
+            <div class="col-md-12 content-block" style="min-height: 500px">
                 <div class="row my-2">
-                        <div class="col-12">
-                                <h4><i class="fa-solid fa-user-plus"></i> Add new student</h4>
+                    <SideBar />  
+                        <div class="col-2 col-md-1">                                                             
+                                <a href="#!" class="ms-2 d-block circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-label="Toggle navigation">
+                                    <span class="text-dark">
+                                    <i class="fa-solid fa-bars"></i>
+                                    </span>
+                                </a> 
+                        </div>
+                        <div class="col-10 col-md-4">                   
+                            <h4 class="h4"> Add student</h4>
+                        </div>
+                        
+                        <div class="col-md-7">
+                                <h4 v-if="message" class="text-success text-center h4 pt-1"><i class="fa-solid fa-check"></i> {{message}}</h4>
                         </div>
                 </div>
+                
                 
                  <div class="card shadow-sm mb-2">
                         <div class="card-body">
@@ -86,9 +97,9 @@
    </div>
 </template>
 <script>
-import SideBar from '@/views/SideBar.vue'
+import SideBar from "@/views/admin/partials/SideBar.vue"
 import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
-import db from "../firebase"
+import db from "@/firebase"
 
 export default {
     name : "AppNewStudent",
@@ -106,13 +117,14 @@ export default {
             deposit:0,
             remark:"",
             select_course: [
-                    {id: 1, course : "Computer Technology, CT - 1", code: "ct1"},
-                    {id: 2, course : "Computer Technology, CT - 2", code: "ct2"},
+                    {id: 1, course : "Computer Technology, CT-1", code: "ct1"},
+                    {id: 2, course : "Computer Technology, CT-2", code: "ct2"},
+                    {id: 8, course : "Computer Technology, CT-3", code: "ct3"},
                     {id: 3, course : "Programming Basic (From Zero To Moderate)", code: "pb1"},
-                    {id: 4, course : "Web Development Level - 1", code: "wd1"},
-                    {id: 5, course : "Web Development Level - 2", code: "wd2"},                   
-                    {id: 6, course : "Basic Coding & Programming For Kids Level -1", code :"bcpkid1"},
-                    {id: 7, course : "Basic Coding & Programming For Kids Level -2", code :"bcpkid2"},
+                    {id: 4, course : "Web Development Level-1", code: "wd1"},
+                    {id: 5, course : "Web Development Level-2", code: "wd2"},                   
+                    {id: 6, course : "Basic Coding & Programming For Kids Level-1", code :"bcpkid1"},
+                    {id: 7, course : "Basic Coding & Programming For Kids Level-2", code :"bcpkid2"},
             ],
             errors: {
                 name: "",
@@ -168,7 +180,11 @@ export default {
                             this.teacherFees=0.70;
                         break;
                         case "ct2":
-                            this.course_fees=200000;
+                            this.course_fees=100000;
+                            this.teacherFees=0.70;
+                        break;
+                        case "ct3":
+                            this.course_fees=150000;
                             this.teacherFees=0.70;
                         break;
                         case "pb1":

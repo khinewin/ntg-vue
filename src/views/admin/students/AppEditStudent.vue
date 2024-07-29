@@ -77,9 +77,9 @@
    </div>
 </template>
 <script>
-import SideBar from '@/views/SideBar.vue'
+import SideBar from "@/views/admin/partials/SideBar.vue"
 import { doc, getDoc, collection, setDoc,query,orderBy, getDocs } from "firebase/firestore"; 
-import db from "../firebase"
+import db from "@/firebase"
 
 export default {
     name : "AppEditStudent",
@@ -152,8 +152,7 @@ export default {
                 this.checkValidation();
                 if(!this.errors.name && !this.errors.email && !this.errors.phone && !this.errors.course && !this.errors.deposit && !this.errors.remark){
                     this.isLoading=true;
-                    const saveDoc=doc(db, "students", this.id)
-                  
+                    const saveDoc=doc(db, "students", this.id)             
                     
                     
                     await setDoc(saveDoc, {

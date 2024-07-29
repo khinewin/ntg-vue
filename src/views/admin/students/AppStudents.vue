@@ -1,17 +1,22 @@
 <template lang="">
    <div class="container-fluid home">
-    <div class="row">
-            <div class="col-md-2 d-none d-md-block">
-                    <SideBar></SideBar>
-            </div>
-            <div class="col-md-10" style="min-height: 500px">
+    <div class="row">           
+            <div class="col-md-12" style="min-height: 500px">
                 <div class="row my-2">
                         <div class="col-12">
                                 <div class="row">
-                                        <div class="col-sm-3" >
-                                                <h4  @click="getAllStudents" ><i class="fa-solid fa-users-line"></i> Students</h4>
-                                        </div>
-                                        <div class="col-sm-3">
+                                   <SideBar />  
+                                       <div class="col-2 col-md-1">                                                             
+                                             <a href="#!" class="ms-2 d-block circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-label="Toggle navigation">
+                                                   <span class="text-dark">
+                                                       <i class="fa-solid fa-bars"></i>
+                                                    </span>
+                                              </a> 
+                                         </div>
+                                          <div class="col-10 col-md-2">                   
+                                                <h4 @click="getAllStudents" class="h4"> Students</h4>
+                                           </div>                                 
+                                     <div class="col-md-3">
                                                <div class="input-group">
                                                 <select class="form-control form-control-sm" @change="filterByCourse" v-model="filter_by_course">
                                                                         <option value="">Filter by course</option>
@@ -22,7 +27,7 @@
                                                                 <div class="input-group-text" @click=clearFilter><i class="fa-solid fa-circle-xmark d-block"></i></div>     
                                                </div>                                          
                                         </div>
-                                        <div class="col-sm-3">
+                                        <div class="col-md-3">
                                                <div class="input-group">
                                                 <select class="form-control form-control-sm" @change="filterByBatch" v-model="filter_by_batch">
                                                                         <option value="">Filter by batch</option>
@@ -122,9 +127,9 @@
    </div>
 </template>
 <script>
-import SideBar from './SideBar.vue';
+import SideBar from "@/views/admin/partials/SideBar.vue"
 import { doc, setDoc, collection, addDoc, deleteDoc, query, getDocs,orderBy,startAt, endAt, getCountFromServer, sum, where, limit } from "firebase/firestore"; 
-import db from "../firebase"
+import db from "@/firebase"
 
 export default {
     name : "AppStudents",
@@ -145,20 +150,19 @@ export default {
         }
     },
     
-    mounted(){        
-       this.fetchBatch();
+    created(){        
+        this.$watch(()=>this.$route,
+        this.fetchBatch,
+        {immediate:true}
+        )
     },
     computed:{
         allStudents(){
                 return this.students;
-        },
-    
+        },   
        
-    },
-    
-    methods :{
-
-        
+    },    
+    methods :{        
         async fetchBatch(){
             const q = query(collection(db, "training"), orderBy("batch", "asc"));
             const querySnapshot = await getDocs(q);

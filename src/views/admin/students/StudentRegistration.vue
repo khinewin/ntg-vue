@@ -1,7 +1,7 @@
 <template>
     <div class="container home">
             <div class="row justify-content-center">
-                <div class="col-sm-6 mt-2 mb-4">
+                <div class="col-md-6 mt-2 mb-4">
                         <div class="card shadow-sm">
                             <div class="card-body">
                                         <h5 class="text-center text-dark  mb-5">Student Registration Form</h5>
@@ -34,8 +34,9 @@
                                                 </select>                                               
                                                 <span v-if="errors.course" class="text-danger small">{{ errors.course }}</span>
                                             </div>
-                                            <div class="mb-5">
-                                                    <button type="submit" class="btn btn-primary btn-lg" :class="{disabled: isLoading}">
+                                            <div class="my-4">
+                                                    <button class="btn btn-outline-secondary btn-lg" type="button" @click="closeReg" >Close</button>
+                                                    <button type="submit" class="btn btn-primary btn-lg float-end" :class="{disabled: isLoading}">
                                                         <div class="spinner-border text-light spinner-border-sm" role="status" v-if="isLoading">
                                                             <span class="visually-hidden">Loading...</span>
                                                          </div>
@@ -66,13 +67,14 @@
                                     <tr><td class="col-5">Email : </td><td>{{ student.email }}</td></tr>
                                     <tr><td class="col-5">Phone : </td><td>{{ student.phone }}</td></tr>
                                     <tr><td class="col-5">Training course : </td>
-                                            <td v-if="student.course==='wd1'">Web Development Level - 1</td>
-                                            <td v-if="student.course==='wd2'">Web Development Level - 2</td>
-                                            <td v-if="student.course==='ct1'">Computer Technology, CT - 1</td>
-                                            <td v-if="student.course==='ct2'">Computer Technology, CT - 2</td>
+                                            <td v-if="student.course==='wd1'">Web Development Level-1</td>
+                                            <td v-if="student.course==='wd2'">Web Development Level-2</td>
+                                            <td v-if="student.course==='ct1'">Computer Technology, CT-1</td>
+                                            <td v-if="student.course==='ct2'">Computer Technology, CT-2</td>
+                                            <td v-if="student.course==='ct3'">Computer Technology, CT-3</td>
                                             <td v-if="student.course==='pb1'">Programming Basic (From Zero To Moderate)</td>
-                                            <td v-if="student.course==='bcpkid1'">Basic Coding & Programming For Kids Level -1</td>
-                                            <td v-if="student.course==='bcpkid2'">Basic Coding & Programming For Kids Level -1</td>
+                                            <td v-if="student.course==='bcpkid1'">Basic Coding & Programming For Kids Level-1</td>
+                                            <td v-if="student.course==='bcpkid2'">Basic Coding & Programming For Kids Level-1</td>
                                      
                                     </tr>
 
@@ -93,7 +95,7 @@
 </template>
 <script>
 import { doc, setDoc, collection, addDoc } from "firebase/firestore"; 
-import db from "../firebase"
+import db from "@/firebase"
 
 export default {
     name: "StudentRegistration",
@@ -104,13 +106,14 @@ export default {
             phone:"",
             education:"",
             select_course: [
-                    {id: 1, course : "Computer Technology, CT - 1", code: "ct1"},
-                    {id: 2, course : "Computer Technology, CT - 2", code: "ct2"},
+                    {id: 1, course : "Computer Technology, CT-1", code: "ct1"},
+                    {id: 2, course : "Computer Technology, CT-2", code: "ct2"},
+                    {id: 8, course : "Computer Technology, CT-3", code: "ct3"},
                     {id: 3, course : "Programming Basic (From Zero To Moderate)", code: "pb1"},
-                    {id: 4, course : "Web Development Level - 1", code: "wd1"},
-                    {id: 5, course : "Web Development Level - 2", code: "wd2"},                   
-                    {id: 6, course : "Basic Coding & Programming For Kids Level -1", code :"bcpkid1"},
-                    {id: 7, course : "Basic Coding & Programming For Kids Level -2", code :"bcpkid2"},
+                    {id: 4, course : "Web Development Level-1", code: "wd1"},
+                    {id: 5, course : "Web Development Level-2", code: "wd2"},                   
+                    {id: 6, course : "Basic Coding & Programming For Kids Level-1", code :"bcpkid1"},
+                    {id: 7, course : "Basic Coding & Programming For Kids Level-2", code :"bcpkid2"},
             ],
             course: "",
             errors: {
@@ -131,11 +134,13 @@ export default {
 
         }
     },
-    mounted(){
+    created(){
     },
 
     methods:{
-
+        closeReg(){
+            this.$router.go("-1")
+        },
         clearError(error){
                 switch(error){
                         case "name":
