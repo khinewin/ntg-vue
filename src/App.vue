@@ -13,7 +13,10 @@
 import NavBar from "@/views/partials/NavBar.vue";
 import FooterBar from "@/views/partials/FooterBar.vue";
 import { doc, setDoc, getDoc, collection, where, addDoc,limit, query, getDocs, startAfter,orderBy, getCountFromServer } from "firebase/firestore"; 
-  import db from "@/firebase"
+import db from "@/firebase"
+import { getAnalytics, logEvent } from "firebase/analytics";
+
+
 
 import {
   getAuth,
@@ -33,13 +36,9 @@ export default {
   created(){
     this.getContentsCount();
     this.checkLogin();
+    this.makeAnalytics();
   },
 
-  updated(){
-  },
-  mounted() {   
-
-  },
 
   computed: {
     isAuthenticated() {
@@ -54,25 +53,37 @@ export default {
   },
 
   methods: {
+
+    makeAnalytics(){
+      const analytics = getAnalytics();
+      logEvent(analytics, 'notification_received');
+    },
+   
     async getContentsCount(){
-      const posts = query(collection(db, "contents"));
-      let postsSnap = await getCountFromServer(posts); 
+      try{
+        const posts = query(collection(db, "contents"));
+        let postsSnap = await getCountFromServer(posts); 
 
-      const articles = query(collection(db, "articles"));
-      let articlesSnap = await getCountFromServer(articles); 
+        const articles = query(collection(db, "articles"));
+        let articlesSnap = await getCountFromServer(articles); 
 
-      const students = query(collection(db, "students"));
-      let studentsSnap = await getCountFromServer(students); 
+        const students = query(collection(db, "students"));
+        let studentsSnap = await getCountFromServer(students); 
 
-      const enrolled = query(collection(db, "enrolled_students"));
-      let enrolledSnap = await getCountFromServer(enrolled); 
+        const enrolled = query(collection(db, "enrolled_students"));
+        let enrolledSnap = await getCountFromServer(enrolled); 
 
-      this.$store.dispatch("setContentsCount", {
-        posts: postsSnap.data().count, 
-        articles: articlesSnap.data().count,
-        students : studentsSnap.data().count,
-        enrolledStudents: enrolledSnap.data().count,
-      })
+        this.$store.dispatch("setContentsCount", {
+          posts: postsSnap.data().count, 
+          articles: articlesSnap.data().count,
+          students : studentsSnap.data().count,
+          enrolledStudents: enrolledSnap.data().count,
+        })
+      }catch(err){
+
+      }finally{
+        
+      }
     },
 
     checkLogin() {

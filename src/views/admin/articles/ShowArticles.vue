@@ -74,6 +74,8 @@
                                                     <div class="col-md-2">
                                                         <div class="fw-light small">Actions</div>
                                                         <div class="small fw-bold">
+                                                            <button class="btn text-primary" @click="goDetail(c.id)"><i class="fa-solid fa-earth-asia"></i></button>
+
                                                             <button class="btn text-primary" @click="goEdit(c.id)"><i class="fa-solid fa-pen-to-square"></i></button>
                                                             <button class="btn text-danger" @click="delCourse(c)"><i class="fa-solid fa-trash-can"></i></button>
                                                         </div>
@@ -163,6 +165,9 @@ export default {
     },
    
     methods:{    
+        goDetail(id){
+            this.$router.push({ name: "ArticleDetails", params: { id: id } });
+        },
         showTime(t){
             const date=t.toDate()
            const options = { year: 'numeric', month: 'long', day: 'numeric' };

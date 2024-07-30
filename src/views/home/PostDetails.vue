@@ -22,9 +22,9 @@
             </vue-load-image>
             <!--  <img :src="post.src" class="card-img-top" :alt="post.title"> -->
             <div class="card-body px-5">
-              <h4 class="card-title text-center mb-4 fw-bold">
+              <h5 class="card-title text-center mb-4  lh-base">
                 {{ post.title }}
-              </h4>
+              </h5>
               <p v-html="post.text_body" class="text-wrap lh-lg"></p>
               <div class="my-4">
                 <AppAddress />

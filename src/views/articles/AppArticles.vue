@@ -149,7 +149,7 @@
         }
     },   
     methods: {    
-
+      
       tryAgain(){
         if(this.genre===null){
           this.fetchArticles();

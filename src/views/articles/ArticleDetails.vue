@@ -22,9 +22,9 @@
             </vue-load-image>
             <!--  <img :src="post.src" class="card-img-top" :alt="post.title"> -->
             <div class="card-body">
-              <h4 class="card-title text-center mb-4 fw-bold">
+              <h5 class="card-title text-center mb-4 lh-base">
                 {{ article.title }}
-              </h4>
+              </h5>
               <div  class="text-wrap lh-lg" v-html="article.content"></div>
               </div>
               </div>
@@ -49,7 +49,11 @@
                   <i class="fa-regular fa-newspaper"></i> Articles
                   </button>
                 </div>
-                <div class="col-6 d-grid">
+                <div class="col-3 d-grid">
+                  <button v-if="isAuth" class="btn text-primary" @click="goEdit(article.id)"><i class="fa-solid fa-pen-to-square"></i></button>
+
+                </div>
+                <div class="col-3 d-grid">
                   <button type="button" class="btn">
                     <iframe
                       :src="
@@ -153,9 +157,15 @@ export default {
   computed:{
       articles(){
         return this.$store.getters.articles;
-      }
+      },
+      isAuth() {
+      return this.$store.getters.isAuthenticated;
+    },
   },
   methods: {
+    goEdit(id){
+            this.$router.push({name:`EditArticle`, params:{id:id}})
+       }, 
     goHome() {
       this.$router.push("/");
     },

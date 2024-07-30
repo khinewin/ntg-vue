@@ -36,6 +36,17 @@ import { text } from '@fortawesome/fontawesome-svg-core';
     lastDocCourse : null,
     hasCourses: false,
 
+    select_courses: [
+      {id: 1, course : "Computer Technology, CT-1", code: "ct1"},
+      {id: 2, course : "Computer Technology, CT-2", code: "ct2"},
+      {id: 8, course : "Computer Technology, CT-3", code: "ct3"},
+      {id: 3, course : "Programming Basic (From Zero To Moderate)", code: "pb1"},
+      {id: 4, course : "Web Development Level-1", code: "wd1"},
+      {id: 5, course : "Web Development Level-2", code: "wd2"},                   
+      {id: 6, course : "Basic Coding & Programming For Kids Level-1", code :"bcpkid1"},
+      {id: 7, course : "Basic Coding & Programming For Kids Level-2", code :"bcpkid2"},
+],
+
   },
 
   getters: {
@@ -67,7 +78,9 @@ import { text } from '@fortawesome/fontawesome-svg-core';
     //admin courses
     courses:state=>state.courses,
     lastDocCourse:state=>state.lastDocCourse,
-    hasCourses:state => state.hasCourses
+    hasCourses:state => state.hasCourses,
+
+    select_courses:state=>state.select_courses
   },
 
   mutations: {

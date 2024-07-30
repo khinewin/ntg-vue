@@ -55,7 +55,7 @@
                                                 -->
                                                 <select @click="clearError('course')" class="form-select form-select-sm"  :class="{'is-invalid' : errors.course}" v-model="course">
                                                     <option value="">Select  course</option>
-                                                    <option v-for="sc in select_course" :key="sc.id" :value="sc.code">{{sc.course}}</option>
+                                                    <option v-for="sc in select_courses" :key="sc.id" :value="sc.code">{{sc.course}}</option>
                                                 </select>
                                                 <label for="course" class="small">Course</label>
                                             </div>
@@ -85,7 +85,7 @@
                                                          </div>
                                                         Save
                                                     </button>
-                                                    <router-link to="/students" class="btn  float-end" :class="{disabled: isLoading}"><i class="fa-solid fa-users-line"></i> Students</router-link>
+                                                    <router-link to="/admin/students" class="btn  float-end" :class="{disabled: isLoading}"><i class="fa-solid fa-users-line"></i> Students</router-link>
                                             </div>
                                         </form>
                                     </div>
@@ -116,16 +116,7 @@ export default {
             teacherFees:0,
             deposit:0,
             remark:"",
-            select_course: [
-                    {id: 1, course : "Computer Technology, CT-1", code: "ct1"},
-                    {id: 2, course : "Computer Technology, CT-2", code: "ct2"},
-                    {id: 8, course : "Computer Technology, CT-3", code: "ct3"},
-                    {id: 3, course : "Programming Basic (From Zero To Moderate)", code: "pb1"},
-                    {id: 4, course : "Web Development Level-1", code: "wd1"},
-                    {id: 5, course : "Web Development Level-2", code: "wd2"},                   
-                    {id: 6, course : "Basic Coding & Programming For Kids Level-1", code :"bcpkid1"},
-                    {id: 7, course : "Basic Coding & Programming For Kids Level-2", code :"bcpkid2"},
-            ],
+            
             errors: {
                 name: "",
                 email: "",
@@ -140,8 +131,13 @@ export default {
             batchs:[]
         }
     },
-    mounted(){
+    created(){
         this.fetchBatch();
+    },
+    computed:{
+        select_courses(){
+            return this.$store.getters.select_courses;
+        }
     },
     methods:{
        async fetchBatch(){

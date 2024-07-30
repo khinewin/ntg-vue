@@ -1,7 +1,7 @@
 <template lang="">
    <div class="container-fluid home">
     <div class="row">           
-            <div class="col-md-12" style="min-height: 500px">
+            <div class="col-md-12">
                 <div class="row my-2">
                         <div class="col-12">
                                 <div class="row">
@@ -14,15 +14,14 @@
                                               </a> 
                                          </div>
                                           <div class="col-10 col-md-2">                   
-                                                <h4 @click="getAllStudents" class="h4"> Students</h4>
+                                                <h4 @click="getAllStudents" class="h4 change-cursor" > Students</h4>
                                            </div>                                 
                                      <div class="col-md-3">
                                                <div class="input-group">
                                                 <select class="form-control form-control-sm" @change="filterByCourse" v-model="filter_by_course">
                                                                         <option value="">Filter by course</option>
-                                                                        <option value="Web Development Level - 1" >WD L-1</option>
-                                                                        <option value="Web Development Level - 2">WD L-2</option>
-                                                                        <option value="Web Development Level - 3">WD L-3</option>
+                                                                       
+                                                                        <option v-for="sc in select_courses" :key="sc.id" :value="sc.code">{{sc.code}}</option>
                                                                 </select>        
                                                                 <div class="input-group-text" @click=clearFilter><i class="fa-solid fa-circle-xmark d-block"></i></div>     
                                                </div>                                          
@@ -45,96 +44,76 @@
                                 </div>
                         </div>
                 </div>
-                <div class="card mb-2 shadow-sm">
-                        <div class="card-body">
+                <div v-if="pageLoading">
+                        <PreLoading class="preLoading" />
+                </div>
+                <div v-if="students.length ==0 && !pageLoading" class="readyClass">
+                        <div class="text-center">Ready to add students record to database.</div>
+                </div>
+                <div class="card shadow-sm mb-2 p-0" v-if="students.length > 0" style="min-height: 450px;">
+                        <div class="card-body p-0">                                                             
+                       <ul class="list-group">                           
+                           <li v-for="stu in students" :key="stu.id" class="list-group-item p-0 my-1 list-group-item-action shadow border-5 border-end-0 border-top-0 border-bottom-0" :class="{ 'border-warning': stu.course_fees > stu.deposit, 'border-success': stu.deposit >= stu.course_fees}">
+                                   <div class="row">                                                
+                                       <div class="col-sm-6 col-md-3  py-1">
+                                               <div class="text-center small fw-light">Name</div>
+                                               <div class="text-center small fw-semibold">{{stu.name}}</div>
+                                       </div>
+                                       <div class="col-sm-6 col-md-3  py-1">
+                                               <div class="text-center small fw-light">E-mail</div>
+                                               <div class="text-center small fw-semibold">{{stu.email}}</div>
+                                       </div>
+                                       <div class="col-sm-6 col-md-3  py-1">
+                                               <div class="text-center small fw-light">Course / Batch</div>
+                                               <div class="text-center small fw-semibold">{{stu.course}} / batch#{{stu.batch}}</div>
+                                       </div>
+                                       <div class="col-sm-6 col-md-3  py-1">
+                                               <div class="text-center small fw-light">Phone</div>
+                                               <div class="text-center small fw-semibold">{{stu.phone}}</div>
+                                       </div>
+                                       
+                                       <div class="col-sm-6 col-md-3  py-1">
+                                               <div class="text-center small fw-light">Course fees (Deposit)</div>
+                                               <div class="text-center small fw-semibold">{{stu.deposit}} MMK</div>
+                                       </div>
+                                       <div class="col-sm-6 col-md-3  py-1">
+                                               <div class="text-center small fw-light">Date</div>
+                                               <div class="text-center small fw-semibold">{{stu.created_at}}</div>
+                                       </div>
+                                       <div class="col-sm-6 col-md-3 py-1">
+                                               <div class="text-center small fw-light">Remark</div>
+                                               <div class="text-center small fw-semibold">{{stu.remark}}</div>
+                                       </div>
+                                       <div class="col-sm-6 col-md-3 py-1">
+                                               <div class="text-center small fw-light">Actions</div>
+                                               <div class="text-center small fw-semibold">
+                                                       <a href="#!" class="text-primary me-3" @click="editStudent(stu.id)" ><i class="fa-solid fa-edit"></i></a>
+                                                   <a href="#!" class="text-danger" @click="removeStudent(stu)"><i class="fa-solid fa-trash"></i></a>
+                                               </div>
+                                       </div>
+                                   </div>
+                           </li>
+                          
+                   </ul>
+               </div>
+               </div>               
                                 
-                                <div class="row my-5" v-if="pageLoading">
-                                        <div class="col-6">
-                                                <div class="spinner-grow text-success float-end" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                        </div>
-                                        <div class="col-6">
-                                                <div class="spinner-grow text-danger" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                        </div>
-                                        <div class="col-6">
-                                                <div class="spinner-grow text-warning float-end" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                        </div>
-                                        <div class="col-6">
-                                                <div class="spinner-grow text-info" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                        </div>
-                                </div>
-                                <div v-for="bat in batchs" :key="bat" class="card shadow-sm mb-2" v-else>
-                                 <div class="card-body">
-                                <h5 class="card-title" @click="getStudentsByBatch(bat)">Batch #{{bat}}</h5> 
-                                                             
-                                <ul class="list-group" v-for="stu in allStudents" :key="stu.id" >
-                                    
-                                    <li v-if="bat===stu.batch"  class="list-group-item list-group-item-action mb-2 shadow-sm border-5 border-end-0 border-top-0 border-bottom-0" :class="{ 'border-warning': stu.course_fees > stu.deposit, 'border-success': stu.deposit >= stu.course_fees}">
-                                            <div class="row">                                                
-                                                <div class="col-sm-6 col-md-3 mb-2">
-                                                        <div class="text-center small fw-light">Name</div>
-                                                        <div class="text-center small fw-semibold">{{stu.name}}</div>
-                                                </div>
-                                                <div class="col-sm-6 col-md-3 mb-2">
-                                                        <div class="text-center small fw-light">E-mail</div>
-                                                        <div class="text-center small fw-semibold">{{stu.email}}</div>
-                                                </div>
-                                                <div class="col-sm-6 col-md-3 mb-2">
-                                                        <div class="text-center small fw-light">Course</div>
-                                                        <div class="text-center small fw-semibold">{{stu.course}}</div>
-                                                </div>
-                                                <div class="col-sm-6 col-md-3 mb-2">
-                                                        <div class="text-center small fw-light">Phone</div>
-                                                        <div class="text-center small fw-semibold">{{stu.phone}}</div>
-                                                </div>
-                                                
-                                                <div class="col-sm-6 col-md-3 mb-2">
-                                                        <div class="text-center small fw-light">Course fees (Deposit)</div>
-                                                        <div class="text-center small fw-semibold">{{stu.deposit}} MMK</div>
-                                                </div>
-                                                <div class="col-sm-6 col-md-3 mb-2">
-                                                        <div class="text-center small fw-light">Date</div>
-                                                        <div class="text-center small fw-semibold">{{stu.created_at}}</div>
-                                                </div>
-                                                <div class="col-sm-6 col-md-3 mb-2">
-                                                        <div class="text-center small fw-light">Remark</div>
-                                                        <div class="text-center small fw-semibold">{{stu.remark}}</div>
-                                                </div>
-                                                <div class="col-sm-6 col-md-3 mb-2">
-                                                        <div class="text-center small fw-light">Actions</div>
-                                                        <div class="text-center small fw-semibold">
-                                                                <a href="#!" class="text-primary me-3" @click="editStudent(stu.id)" ><i class="fa-solid fa-edit"></i></a>
-                                                            <a href="#!" class="text-danger" @click="removeStudent(stu)"><i class="fa-solid fa-trash"></i></a>
-                                                        </div>
-                                                </div>
-                                            </div>
-                                    </li>
-                                   
-                            </ul>
-                        </div>
-                </div>
-                        </div>
-                </div>
+                                
+                                
             </div>
-    </div>
+        </div>
    </div>
 </template>
 <script>
 import SideBar from "@/views/admin/partials/SideBar.vue"
 import { doc, setDoc, collection, addDoc, deleteDoc, query, getDocs,orderBy,startAt, endAt, getCountFromServer, sum, where, limit } from "firebase/firestore"; 
 import db from "@/firebase"
+import PreLoading from '@/views/loaders/PreLoading.vue'
 
 export default {
     name : "AppStudents",
     components: {
-        SideBar
+        SideBar,PreLoading
     },
     data(){
         return {
@@ -155,11 +134,19 @@ export default {
         this.fetchBatch,
         {immediate:true}
         )
+        this.$watch(()=>this.$route,
+        this.fetchStudents,
+        {immediate:true}
+        )
     },
     computed:{
         allStudents(){
                 return this.students;
         },   
+
+        select_courses(){
+                return this.$store.getters.select_courses;
+        }
        
     },    
     methods :{        
@@ -172,7 +159,7 @@ export default {
                 this.batchs.unshift(batch);
                 if(doc.data().active){
                         this.current_batch=doc.data().batch;
-                        this.fetchStudents();
+                       
                 }
             })
         },
@@ -205,7 +192,7 @@ export default {
         this.filter_by_batch="";
         this.filter_by_course="";
         this.pageLoading=true;
-                const q = query(collection(db, "students"), orderBy("created_at", "asc"));
+                const q = query(collection(db, "students"), orderBy("order_date", "asc"));
             
             const querySnapshot = await getDocs(q);
                  let stus=[];
@@ -234,22 +221,23 @@ export default {
        
         async fetchStudents(){
             this.pageLoading=true;
+            this.students=[];
             let q;
             if(this.filter_by_batch){
-                 q = query(collection(db, "students"), where("batch", "==", this.filter_by_batch), orderBy("created_at", "asc"));
+                 q = query(collection(db, "students"), where("batch", "==", this.filter_by_batch), orderBy("order_date", "asc"));
             }
             if(this.filter_by_course){
-                 q = query(collection(db, "students"), where("course", "==", this.filter_by_course), orderBy("created_at", "asc"));
+                 q = query(collection(db, "students"), where("course", "==", this.filter_by_course), orderBy("order_date", "asc"));
             }
                   
             if(!this.filter_by_batch && !this.filter_by_course && !this.search_by_name){
-                 q = query(collection(db, "students"), orderBy("created_at", "asc"), limit(50));
+                 q = query(collection(db, "students"), orderBy("order_date", "asc"), limit(50));
             }
             
             const querySnapshot = await getDocs(q);
-            this.students=[];
+            let stus=[];
             querySnapshot.forEach((doc) => {
-                let stu={};              
+                let stu={};             
            
                 stu.name=doc.data().name;
                 stu.email=doc.data().email;
@@ -260,13 +248,12 @@ export default {
                 stu.id=doc.id;
                 stu.created_at=doc.data().created_at;
                 stu.course_fees=doc.data().course_fees;
-                stu.batch=doc.data().batch;
-               
-               this.students.unshift(stu);
+                stu.batch=doc.data().batch;               
+                stus.unshift(stu);              
 
             })
             this.pageLoading=false;
-
+            this.students=stus;
             
         },
         editStudent(id){
@@ -290,5 +277,13 @@ export default {
 <style lang="css">
     .change-cursor{
         cursor:pointer;
+    }
+    .preLoading{
+        margin-top: 200px;
+        margin-bottom: 200px;
+    }
+    .readyClass{
+        margin-top: 200px;
+        margin-bottom: 220px;
     }
 </style>

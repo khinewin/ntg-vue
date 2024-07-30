@@ -63,6 +63,8 @@
                                                          </div>
                                                         Save
                                                     </button>
+                                                    <button @click="goPublic" class="btn  float-end" :class="{disabled: isLoading}"><i class="fa-solid fa-earth-asia"></i> Public</button>
+
                                                     <router-link to="/admin/articles" class="btn  float-end" :class="{disabled: isLoading}"><i class="fa-solid fa-pen-nib"></i> Articles</router-link>
                                             </div>
                                         </form>
@@ -115,12 +117,27 @@ export default {
          
             editor: ClassicEditor,
             editorData: '',
-            editorConfig: {
+            editorConfig: {              
               plugins: [ Bold, Essentials, Italic, Mention, Paragraph, Undo, Image, ImageInsert, Link, List,MediaEmbed,Table, TableToolbar,TableProperties, TableCellProperties ],
               toolbar: [ 'undo', 'redo', '|', 'bold', 'italic', "ImageInsert", "link", "bulletedList", "numberedList", "mediaEmbed", "insertTable"],
               table: {
                     contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties' ]
               },
+              link: {
+            // Automatically add target="_blank" and rel="noopener noreferrer" to all external links.
+                addTargetToExternalLinks: true,
+
+                // Let the users control the "download" attribute of each link.
+                decorators: [
+                    {
+                        mode: 'manual',
+                        label: 'Downloadable',
+                        attributes: {
+                            download: 'download',
+                        }
+                    }
+                    ]
+                },
               mention: { 
                   // Mention configuration
               },
@@ -148,7 +165,10 @@ export default {
         }
    },
     methods:{      
-      
+      goPublic(e){
+            e.preventDefault();        
+            this.$router.push({ name: "ArticleDetails", params: { id: this.id } });  
+      },
      
       getCourse(){
             if(this.courses.length > 0){

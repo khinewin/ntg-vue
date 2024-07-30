@@ -3,7 +3,8 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import VueLoadImage from "vue-load-image";
-
+import VueGtag from "vue-gtag";
+//Vue.config.productionTip = false;
 
 import { library, dom } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -27,6 +28,11 @@ const head = createHead()
 
 
 createApp(App)
+.use(VueGtag, {
+    config: {
+         id: "G-06V80FXW57"},
+    
+  })
 
 .use(head)
 .use(store)
