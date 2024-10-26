@@ -4,7 +4,9 @@
             <div
               class="card-body bg-secondary rounded-top p-0 pt-5 px-2 px-md-5"
             >
-              <div class="bg-body text-center rounded-top pt-5 pb-2 mt-5 mx-2 px-2">
+              <div class="bg-body text-center rounded-top pt-5 pb-2 mt-5 mx-2 px-2 position-relative">
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-white text-danger circle" style="font-size: 17px;">{{disappearCount}}</span>
+
                 <img
                   src="@/assets/ntg-logo.png"
                   class="img-fluid"
@@ -27,7 +29,7 @@
 </template>
 <script>
 export default {
-    
+      props: ['disappearCount']
 }
 </script>
 <style lang="">

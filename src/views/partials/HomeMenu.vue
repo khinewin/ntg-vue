@@ -5,7 +5,7 @@
                 <button class="btn btn-secondary" @click="goHome" :class="{'btn-dark' : whoIsActive==='home'}">
                    <span class="position-relative">
                     <i class="fa-solid fa-house"></i>
-                    <span v-if="whoIsActive==='home'" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">{{articles.length}}</span>
+                    <span v-if="whoIsActive==='home'" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">{{courses.length}}</span>
                     </span>
                 </button>
             </div>    
@@ -13,7 +13,7 @@
                 <button class="btn btn-secondary" :class="{'btn-dark' : c.active}" @click="postsByCategory(c.name)">
                     <span class="position-relative">
                         {{c.title}}
-                        <span v-if="whoIsActive===c.name" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">{{articles.length}}</span>
+                        <span v-if="whoIsActive===c.name" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">{{courses.length}}</span>
                     </span>                   
                 </button>
             </div>           
@@ -22,7 +22,7 @@
 </template>
 <script>
 export default {
-    props:['articles'],
+    props: ['courses'],
     data(){
         return {
         
@@ -35,12 +35,16 @@ export default {
             ]
         }
     },
-    created(){
-        if(this.$route.query.cat != undefined){
-                this.whoIsActive=this.$route.query.cat;
-        }
+    created(){      
+        if(this.storeCategory !==null ) this.whoIsActive=this.storeCategory;
+        
         this.changeActive();
+    },
 
+    computed:{
+       storeCategory(){
+        return this.$store.getters.courseCategory;
+       }
     },
     
     methods: {

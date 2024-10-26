@@ -1,8 +1,8 @@
 <template lang="">
-    <div class="container-fluid home">
+    <div class="container-fluid home min-vh-100">
     <div class="row">
            
-            <div class="col-md-12 content-block" style="min-height: 500px">
+            <div class="col-md-12 content-block">
                 <div class="row my-2">
                     <SideBar />  
                         <div class="col-2 col-md-1">                                                             
@@ -31,12 +31,12 @@
                         </div>
                             <div v-if="courses.length > 0">
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item mb-1 shadow-sm" v-for="c in courses" :key="c.id">
+                                    <li class="list-group-item mb-1 shadow-sm" v-for="c in courses" :key="c[0]">
                                             <div class="row">
                                                     <div class="col-md-1">
                                                         <div class="fw-light small">CT-ID</div>
                                                         <div class="small">
-                                                            {{c.content_id}}
+                                                            {{c[1].course_id}}
                                                         </div>
                                                     </div>
                                                     <div class="col-md-2">
@@ -44,7 +44,7 @@
                                                         <div>
                                                             <vue-load-image>
                                                                 <template v-slot:image>
-                                                                  <img :src="c.src" class="img-fluid" />
+                                                                  <img :src="c[1].src" class="img-fluid" />
                                                                 </template>
                                                                 <template v-slot:preloader>
                                                                     <ImageLoading />
@@ -57,39 +57,32 @@
                                                         <div class="fw-light small">Title</div>
                                                         <div class="small ">
                                                             <div class="fw-bold mb-2">{{c.title}}</div>
-                                                            <div>{{c.course_fees.toLocaleString("en-US")}} MMK</div>
+                                                            <div>{{c[1].course_fees.toLocaleString("en-US")}} MMK</div>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <div class="fw-light small">Contents</div>
                                                         <div class="small" >
-                                                            {{c.content.substring(0, 200)}}
+                                                            {{c[1].content.substring(0, 200)}}
                                                         </div>
                                                     </div>
                                                     <div class="col-md-2">
                                                         <div class="fw-light small">Category</div>
                                                         <div class="small fw-bold">
-                                                            {{c.category}}
+                                                            {{c[1].category}}
                                                         </div>
                                                     </div>
                                                     <div class="col-md-2">
                                                         <div class="fw-light small">Actions</div>
                                                         <div class="small fw-bold">
-                                                            <button class="btn text-primary" @click="goEdit(c.id)"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                            <button class="btn text-primary" @click="goEdit(c[0])"><i class="fa-solid fa-pen-to-square"></i></button>
                                                             <button class="btn text-danger" @click="delCourse(c)"><i class="fa-solid fa-trash-can"></i></button>
                                                         </div>
                                                     </div>
                                             </div>
                                     </li>
                                 </ul>
-                                <div class="row justify-content-center mt-3 mb-2" v-if="hasCourses">
-                                    <div class="col-sm-6 col-md-4 d-grid">
-                                      <button class="btn btn-primary rounded" type="button" :disabled="error || !hasCourses || btnSpinner" @click="getCourses">
-                                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" v-if="btnSpinner"></span>
-                                        More courses <i class="fa-solid fa-circle-chevron-down"></i>
-                                      </button>
-                                    </div>
-                                </div>
+                               
                             </div>
                                 
                         </div>
@@ -100,11 +93,12 @@
 </template>
 <script>
 import SideBar from '@/views/admin/partials/SideBar.vue'
-import { doc, setDoc, collection, query, getDocs, deleteDoc, docs,orderBy, limit, where , startAfter, updateDoc, getCountFromServer} from "firebase/firestore"; 
-import db from "@/firebase"
+//import { doc, setDoc, collection, query, getDocs, deleteDoc, docs,orderBy, limit, where , startAfter, updateDoc, getCountFromServer} from "firebase/firestore"; 
+import db from "@/firebase/database"
 import PreLoading from "@/views/loaders/PreLoading.vue"
 import ShowError from "@/views/partials/ShowError.vue"
 import ImageLoading from "@/views/loaders/ImageLoading"
+import { getDatabase, ref, set, onValue, remove, query, startAt,endAt, orderByChild ,limitToLast, limitToFirst} from 'firebase/database'
 
 
 export default {
@@ -117,10 +111,7 @@ export default {
         return {
             error: null,
             showSpinner: false,
-            courses:[],
-            lastDoc:null,
-            hasCourses: false,
-            btnSpinner: false,
+            courses:[],       
             message:null
         }
     },
@@ -132,121 +123,50 @@ export default {
             this.getCourses,
             {immediate: true}
          )  
-        /*
-        if(this.storeCourses.length <= 0){
-          this.$watch(
-            ()=>this.$route,
-            this.getCourses,
-            {immediate: true}
-         )           
-      }else{
-          this.courses=this.storeCourses
-          this.lastDoc=this.storeLastDoc
-          this.hasCourses=this.storeHasCourses;
-       
-      }  
-
-    */
+ 
     },
  
  
-
-    computed:{
-        storeCourses(){
-            return  this.$store.getters.courses;
-        },
-        storeLastDoc(){
-            return this.$store.getters.lastDocCourse;
-        },
-        storeHasCourses(){
-            return this.$store.getters.hasCourses;
-        }
-    },
-   
     methods:{    
        goEdit(id){
             this.$router.push({name:`EditCourse`, params:{id:id}})
        }, 
-       async delCourse(c){
-            const conF=confirm(`Want to delete this course ID : ${c.id} `)
+        delCourse(c){
+            const conF=confirm(`Want to delete this course  : ${c[1].title} `)
             if(conF){
-                await deleteDoc(doc(db, "contents", c.id)).then(()=>{
-                       this.courses=[];
-                       this.showSpinner=true; 
-                       this.hasCourses=null;
-                       this.lastDoc=null;
-                       this.getCourses();
+                const query_url = ref(db, 'courses/' + c[0])
+                remove(query_url).then(()=>{
                         this.message="The selected course has been deleted."
-                })
+                }).catch(()=>{
+                    this.error="Oops.., something went wrong."
+                })     
             }
         },
-       async getCourses(){
-            try{        
-                    this.btnSpinner=true;
-                    this.error=false;
-                    if(this.courses.length > 0){
-                        this.showSpinner=false;
-                    }else{
-                    this.showSpinner=true;
-                    }     
-
-                     //get articles count from firestore
-                    const coll = collection(db, "contents");
-                    const countSnapshot=await getCountFromServer(coll);
-                    const coursesCount=countSnapshot.data().count;
-                    //end get articles count from firestore
-
-                    //first display data from firestore
-                    const first = query(collection(db, "contents"), orderBy("content_id", "desc"), limit(4));
-                    let documentSnapshots = await getDocs(first);       
-                    //end first display data from firestore
-
-                    if(this.lastDoc !== null){      //check if first display of last item has or not
-                        const next = query(collection(db, "contents"), orderBy("content_id", "desc"),startAfter(this.lastDoc), limit(4));
-                        documentSnapshots=await getDocs(next)
-                    }     
-
-                    const lastDoc = documentSnapshots.docs[documentSnapshots.docs.length-1];
-                    this.lastDoc=lastDoc;  
-                        
-                    let data=documentSnapshots._snapshot.docChanges;
-                    if(data.length <= 0 ){
-                        this.error="Oops..., something went wrong."
-                    }else{
-                        let arts=[]
-                        documentSnapshots.forEach((doc) => {         
-                            let post = {
-                                id: doc.id,
-                                title: doc.data().title,
-                                content: doc.data().text_body,
-                                src: doc.data().src,
-                                category: doc.data().category,
-                                course_fees: doc.data().course_fees,
-                                content_id: doc.data().content_id
-                            };
-                            arts.push(post);          
-                        
-                        });
-                        const newCourses=[...this.courses, ...arts]
-                        this.courses=newCourses;
-                        this.error=null;              
-
-                        if(coursesCount=== newCourses.length){
-                            this.hasCourses=false;
-                        }else{
-                            this.hasCourses=true;  
-                        }             
-
-                            //store courses on vuex store;
-                        this.$store.dispatch("setCourses", {courses: arts, lastDoc: this.lastDoc, hasCourses: this.hasCourses})                
-                    }
-
-                }catch(err){
-                    this.error="Oops..., something went wrong.";
-                }finally{
+        getCourses(){
+            try{
+                this.showSpinner=true;
+                const query_url = query(ref(db, 'courses/'))
+                onValue(query_url, (snapshot) => {
+                    const data = snapshot.val()                   
                     this.showSpinner=false;
-                    this.btnSpinner=false;
-                }
+                    if(data ===null){
+                        this.courses=[];
+                        this.error="Add new course."
+                    }else{
+                        this.error=null;
+                        const courses=Object.entries(data);
+                        this.courses=courses.reverse();                         
+                        const count=Object.keys(data).length;
+                       
+                    }                   
+                })
+            }catch(err){
+                this.error="Oops..., something went wrong."
+                this.showSpinner=false;
+
+            }finally{
+                //this.showSpinner=false;
+            }
         }
    }
 }

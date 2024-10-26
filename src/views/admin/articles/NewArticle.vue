@@ -1,7 +1,7 @@
 <template lang="">
-    <div class="container-fluid home">
+    <div class="container-fluid home min-vh-100">
     <div class="row">           
-            <div class="col-md-12 content-block" style="min-height: 500px">
+            <div class="col-md-12 content-block">
                 <div class="row my-2">
                     <SideBar />  
                         <div class="col-2 col-md-1">                                                             
@@ -20,12 +20,12 @@
                         </div>
                 </div>
                 
-                 <div class="card shadow-sm mb-2">
+                 <div class="card shadow-sm mb-2 min-vh-100">
                         <div class="card-body">
                             <div class="row my-2 justify-content-center">
                                  <div class="col-sm-6">                             
                                     
-                                        <form @submit.prevent="savePost">
+                                        <form @submit.prevent="saveArticle">
                                          
                                             <div class="text-danger small ms-2 mb-2" v-if="errors.title">{{errors.title}}</div>
                                             <div class="form-floating mb-3">                                                
@@ -75,9 +75,10 @@
 </template>
 <script>
 import SideBar from '@/views/admin/partials/SideBar.vue'
-import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
-import db from "@/firebase"
+//import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
+import  "@/firebase/database"
 import { ClassicEditor, Bold, Essentials, Italic, Mention, Paragraph, Undo, Image, ImageInsert, Link, List, MediaEmbed ,Table, TableToolbar,TableCellProperties, TableProperties, } from 'ckeditor5';
+import { getDatabase, ref, set, onValue, remove,query, startAt, endAt, orderByChild } from 'firebase/database'
 
   import { Timestamp } from "firebase/firestore";
   import CKEditor from '@ckeditor/ckeditor5-vue';
@@ -100,7 +101,6 @@ export default {
             category:"",
             content:"",
             category:"",
-            created_at:"",
             message: null,
 
             errors:{
@@ -109,7 +109,6 @@ export default {
                 category:"",
                 content:"",
                 category:"",
-                created_at:"",
             },
             editor: ClassicEditor,
             editorData: '',
@@ -146,33 +145,30 @@ export default {
     },
    
     methods:{      
-      
-        async savePost(){
-                this.checkValidation();
-                if(!this.errors.src && !this.errors.content && !this.errors.title && !this.errors.category){
-                    this.isLoading=true;                  
-                    const saveCollection=collection(db, "articles", )
-                    let saveData=await addDoc(saveCollection, {
-                            title: this.title,
-                            src: this.src,
-                            category: this.category, 
-                            content: this.content,
-                            created_at: Timestamp.fromDate(new Date())                     
-                    
-                        })
-                    if(saveData.id){
+        saveArticle(){
+            //const db=getDatabase();
+            this.checkValidation();
+            if(!this.errors.src && !this.errors.content && !this.errors.title && !this.errors.category){
+                this.isLoading=true; 
+                const article={title: this.title, src: this.src, category: this.category, content: this.content, created_at: Date.now() }
+                const id = Date.now()
+                const query = ref(db, 'articles/' + id)
+                set(query, article)
+                .then(()=>{
                         this.message="The article has been created."
                         this.isLoading=false;              
                         this.src="";
                         this.content="";
                         this.title="";           
                         this.category="";
-                        this.created_at="";
-                    }
-               
-                
+                })
+                .catch((err)=>{
+                    this.isLoading=false;
+                })
             }
         },
+        
+   
         clearError(errors){
                 switch(errors){
                         case "title":

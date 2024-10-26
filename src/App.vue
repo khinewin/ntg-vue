@@ -1,5 +1,6 @@
 <template>
-  <nav-bar
+  <div>
+    <nav-bar
     :loginEmail="loginEmail"
     :loginUid="loginUid"
     :isAuthenticated="isAuthenticated"
@@ -8,13 +9,16 @@
   <router-view />
 
   <footer-bar></footer-bar>
+  </div>
 </template>
 <script>
 import NavBar from "@/views/partials/NavBar.vue";
 import FooterBar from "@/views/partials/FooterBar.vue";
-import { doc, setDoc, getDoc, collection, where, addDoc,limit, query, getDocs, startAfter,orderBy, getCountFromServer } from "firebase/firestore"; 
-import db from "@/firebase"
+//import { doc, setDoc, getDoc, collection, where, addDoc,limit, query, getDocs, startAfter,orderBy, getCountFromServer } from "firebase/firestore"; 
+import db from "@/firebase/database"
+import fs from "@firebase/firestore"
 import { getAnalytics, logEvent } from "firebase/analytics";
+import { ref, set, onValue, remove, startAt,endAt, orderByChild ,limitToLast, limitToFirst} from 'firebase/database'
 
 
 
@@ -34,8 +38,8 @@ export default {
   },
 
   created(){
-    this.getContentsCount();
-    this.checkLogin();
+   this.getContentsCount();
+   this.checkLogin();
     this.makeAnalytics();
   },
 
@@ -59,31 +63,54 @@ export default {
       logEvent(analytics, 'notification_received');
     },
    
-    async getContentsCount(){
-      try{
-        const posts = query(collection(db, "contents"));
-        let postsSnap = await getCountFromServer(posts); 
+     getContentsCount(){
+      try{     
+        const courseUrl = ref(db, "courses");
+        onValue(courseUrl, (snapshot) => {
+          const courseData = snapshot.val();
+          if(courseData !==null) {
+                const coursesCount=Object.keys(courseData).length;
+                this.$store.dispatch("setCoursesCount", coursesCount)
+          }
+        });
 
-        const articles = query(collection(db, "articles"));
-        let articlesSnap = await getCountFromServer(articles); 
+        const articleUrl = ref(db, "articles");
+        onValue(articleUrl, (snapshot) => {
+          const articleData = snapshot.val();
+          if(articleData !==null) {
+                const articlesCount=Object.keys(articleData).length;
+                this.$store.dispatch("setArticlesCount", articlesCount)
+          }
+        });
 
-        const students = query(collection(db, "students"));
-        let studentsSnap = await getCountFromServer(students); 
+        const enrolledUrl = ref(db, "enrolledStudents");
+        onValue(enrolledUrl, (snapshot) => {
+          const enrolledData = snapshot.val();
+          if(enrolledData !==null) {
+                const enrolledCount=Object.keys(enrolledData).length;
+                this.$store.dispatch("setEnrolledCount", enrolledCount)
+          }
+        });
 
-        const enrolled = query(collection(db, "enrolled_students"));
-        let enrolledSnap = await getCountFromServer(enrolled); 
+        const studentsUrl = ref(db, "students");
+        onValue(studentsUrl, (snapshot) => {
+          const studentsData = snapshot.val();
+          if(studentsData !==null) {
+                const studentsCount=Object.keys(studentsData).length;
+                this.$store.dispatch("setStudentsCount", studentsCount)
+                const trainingsData=[]
+                Object.values(studentsData).map((stu)=>{
+                    trainingsData.push(...stu.courses)
+                })
+                this.$store.dispatch("setTrainingsCount", trainingsData.length)
+                
+          }
+        });
 
-        this.$store.dispatch("setContentsCount", {
-          posts: postsSnap.data().count, 
-          articles: articlesSnap.data().count,
-          students : studentsSnap.data().count,
-          enrolledStudents: enrolledSnap.data().count,
-        })
-      }catch(err){
-
-      }finally{
+     }catch(err){
+          console.log("rrro")
+      }finally{}
         
-      }
     },
 
     checkLogin() {

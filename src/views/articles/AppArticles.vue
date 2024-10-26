@@ -1,26 +1,26 @@
 <template>
     <div class="home">
-      <div class="container my-4">    
+      <div class="container my-4 min-vh-100">    
          <!-- category -->
           <div class="row">
             <div class="col-12 mb-2">
               <h5>Computer and Technology Articles</h5>
             </div>
             <div class="col-12">
-              <ArticlesMenu @category="changeCategory" @search-article="searchArticles"  :articles="articles"/>
+              <ArticlesMenu @category="changeCategory"   :articles="articles"/>
           </div>
           </div>
           
          <!-- end category -->
           <div v-if="error">
-             <ShowError :error="error" @tryAgain="tryAgain" class="articles-error" /> 
+             <ShowError :error="error"  class="articles-error" /> 
           </div>
          <div v-if="showSpinner">          
             <PreLoading class="articles-preloader" />
         </div>
        
-        <div class="row g-2">
-          <div v-for="post in articles" :key="post.id" class="col-sm-6 col-md-3">
+        <div class="row g-2" v-if="articles.length > 0">
+          <div v-for="a in articles" :key="a[0]" class="col-sm-6 col-md-3">
             <!--start col-->
             <div class="card shadow border-0 bg-secondary  rounded" >
               <div
@@ -30,7 +30,7 @@
                   <div class="show-image-container  rounded">
                     <vue-load-image>
                       <template v-slot:image>
-                        <img :src="post.src" class="img-fluid show-image" @click="viewDetails(post.id, post.title, post.src)"  />
+                        <img :src="a[1].src" class="img-fluid show-image" @click="viewDetails(a[0])"  />
                       </template>
                       <template v-slot:preloader>
                           <ImageLoading />
@@ -44,9 +44,9 @@
             </div>
             <!--end col-->
           </div>
-          <div class="row justify-content-center mt-3" v-if="hasArticles">
+          <div class="row justify-content-center mt-3" v-if="isShowBtn">
               <div class="col-sm-6 col-md-4 d-grid">
-                <button class="btn btn-primary rounded" type="button" :disabled="error || !hasArticles || btnSpinner" @click="fetchArticles">
+                <button class="btn btn-primary rounded" type="button"  @click="getNextArticles">
                   <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" v-if="btnSpinner"></span>
                   More articles <i class="fa-solid fa-circle-chevron-down"></i>
                 </button>
@@ -66,9 +66,10 @@
   import ImageLoading from "@/views/loaders/ImageLoading"
   import ArticlesMenu from "@/views/partials/ArticlesMenu"
   import ShowError from "@/views/partials/ShowError"
-  import { doc, setDoc, getDoc, collection, where, addDoc,limit, query, getDocs, startAfter,orderBy, getCountFromServer } from "firebase/firestore"; 
-  import db from "@/firebase"
-  
+  //import { doc, setDoc, getDoc, collection, where, addDoc,limit, query, getDocs, startAfter,orderBy, getCountFromServer } from "firebase/firestore"; 
+  import db from "@/firebase/database"
+  import { getDatabase, ref, set, onValue, remove, query, startAt,endAt, orderByChild ,limitToLast, limitToFirst} from 'firebase/database'
+
   export default {
 
     
@@ -110,259 +111,123 @@
     },
     data() {
       return { 
-        genre: null,  
+        cat: null,  
         articles:[],
         error:null,
-        hasArticles:false,
         showSpinner: false,      
         btnSpinner: false,
-        lastDoc: null
+        limitTo: 8,
+        articlesCount: 0,
+        isShowBtn: false,
       };
     },
    
  
     created() {
-      
-      if(this.storeArticles.length <= 0){
-          this.$watch(
+      if(this.storeArticleLimitTo > 0){
+            this.limitTo=this.storeArticleLimitTo;
+        }
+        if(this.storeCategory !==null){
+            this.cat=this.storeCategory;
+        }
+        
+         this.$watch(
             ()=>this.$route,
-            this.fetchArticles,
+            this.getArticlesCount,
             {immediate: true}
-         )           
-      }else{
-          this.articles=this.storeArticles
-          this.lastDoc=this.storeLastDoc
-          this.hasArticles=this.storeHasArticles;
-      }  
+         )  
+         this.$watch(
+            ()=>this.$route,
+            this.getArticles,
+            {immediate: true}
+         ) 
+         
     
     },    
 
     computed:{
-        storeArticles(){
-          return this.$store.getters.articles;
-        },
-        storeLastDoc(){
-          return this.$store.getters.lastDoc
-        },
-        storeHasArticles(){
-          return this.$store.getters.hasArticles;
-        }
+      storeArticleLimitTo(){
+            return this.$store.getters.articleLimitTo;    
+      },
+      storeCategory(){
+        return this.$store.getters.category;
+      }
     },   
-    methods: {    
-      
-      tryAgain(){
-        if(this.genre===null){
-          this.fetchArticles();
-        }else{
-          this.fetchArticlesByGenre();
-        }
-          
+    methods: {        
+
+      changeCategory(cat){             
+         this.cat=cat;
+         this.getArticlesCount();     
+         this.$store.dispatch("setCategory", cat)   
+         this.getArticles();
       },
 
-      changeCategory(cat){
-              this.articles=[]
-              this.lastDoc=null
-              this.hasArticles=false;
-              this.showSpinner=false;
-              this.btnSpinner=false;
-              this.$store.dispatch("setArticles", {articles: [],lastDoc: null, hasArticles: false})
-          if(cat==="home"){
-                this.fetchArticles();
+      getNextArticles(){
+            this.btnSpinner=true;
+            this.limitTo += this.limitTo;
+            this.getArticles();            
+            this.$store.dispatch("setArticleLimitTo", this.limitTo)
+        },
+
+        getArticlesCount(){
+          let query_url=""; 
+            if(this.cat===null || this.cat ==="home"){
+              query_url= query(ref(db, 'articles/'))
             }else{
-                this.genre=cat;
-                this.fetchArticlesByGenre();
-            }     
-
-      },
-
-      async searchArticles(searchTitle){
-        
-        try{
-          this.error=false;
-          this.showSpinner=true;
-          this.articles=[]
-          this.lastDoc=null
-          this.$store.dispatch("setArticles", {articles: [], hasArticles: false, lastDoc: null})
-
-          const docsSnapshot = query(collection(db, "articles"), orderBy("created_at", "desc"), limit(20));
-          let documentSnapshots = await getDocs(docsSnapshot); 
-          let data=documentSnapshots._snapshot.docChanges;
-                if(data.length <= 0 ){
-                    this.error="No articles found."
-                    this.hasArticles=false;                  
-                }else{ 
-                    let arts=[]
-                              documentSnapshots.forEach((doc) => {         
-                                let post = {
-                                    id: doc.id,
-                                    title: doc.data().title,
-                                    content: doc.data().content,
-                                    src: doc.data().src,
-                                    category: doc.data().category,
-                                };
-                                arts.push(post);  
-                              });
-                     const result=arts.filter((art)=>{
-                      return art.title.toLowerCase().includes(searchTitle.toLowerCase())
-                      })
-                      if(result.length === 0){
-                        this.error=`Result not found for ${searchTitle}.`
-                        this.hasArticles=false; 
-                      }
-                    this.articles=result;    
-                }
-        }catch(err){
-              this.error="Oops..., something went wrong.";
-              this.hasArticles=false;    
-        }finally{
-              this.showSpinner=false;
-        }
-        
-      },
-     
-      async fetchArticlesByGenre(){   
-       
-            try{        
-              this.error=false;
-              this.btnSpinner=true;
-
-              if(this.articles.length > 0){
-                  this.showSpinner=false;
-              }else{
-                this.showSpinner=true;
-              }
-              //get articles count from firestore
-              const coll = query(collection(db, "articles"), where("category","==", this.genre));
-              const countSnapshot=await getCountFromServer(coll);
-              const articlesCount=countSnapshot.data().count;
-              //end get articles count from firestore
-
-              //first display data from firestore
-              const first = query(collection(db, "articles"), where("category","==", this.genre), orderBy("created_at", "desc"), limit(12));
-              let documentSnapshots = await getDocs(first);  
-              //end first display data from firestore
-
-              if(this.lastDoc !== null){      //check if first display of last item has or not
-                const next = query(collection(db, "articles"), where("category","==", this.genre), orderBy("created_at", "desc"),startAfter(this.lastDoc), limit(12));
-                documentSnapshots=await getDocs(next)
-              }     
-              
-              //first display data of last item from firestore
-            const lastDoc = documentSnapshots.docs[documentSnapshots.docs.length-1];
-            this.lastDoc=lastDoc;  
-            //end first display data of last item from firestore
-                  
-              let data=documentSnapshots._snapshot.docChanges;
-                if(data.length <= 0 ){
-                    this.error="Oops..., something went wrong."
-                    this.hasArticles=false;                  
+              query_url = query(ref(db, 'articles/'), orderByChild("category"), startAt(this.cat), endAt(this.cat))
+            }         
+            onValue(query_url, (snapshot) => {
+                const data = snapshot.val()
+                if(data===null){
+                  this.articlesCount=0;
                 }else{
-                    let arts=[]
-                    documentSnapshots.forEach((doc) => {         
-                      let post = {
-                          id: doc.id,
-                          title: doc.data().title,
-                          content: doc.data().content,
-                          src: doc.data().src,
-                          category: doc.data().category,
-                      };
-                      arts.push(post);   
-                  
-                  });
-                      const newArticles=[...this.articles, ...arts]
-                      this.articles=newArticles;
-                      this.error=null;              
-
-                      if(articlesCount=== newArticles.length){
-                        this.hasArticles=false;
-                      }else{
-                        this.hasArticles=true;  
-                      }
-                      //store articles on vuex store;
-                      this.$store.dispatch("setArticles", {articles: newArticles, lastDoc: this.lastDoc, hasArticles: this.hasArticles})                
-                }
-
-            }catch(err){
-              this.error="Oops..., something went wrong.";
-              this.hasArticles=false;    
-            }finally{
-              this.showSpinner=false;
-              this.btnSpinner=false;
-            }
-    },
-
-     
-      async fetchArticles(){        
-            try{        
-              this.error=false;
+                  const count=Object.keys(data).length;
+                  this.articlesCount=count;
+                 // this.getArticles();
+                }               
+            })
+        },
+      
+        getArticles(){            
+            try{           
+              let query_url="";
+              this.showSpinner=true;
               this.btnSpinner=true;
-
-              if(this.articles.length > 0){
-                  this.showSpinner=false;
+              if(this.cat===null || this.cat ==="home"){
+                query_url= query(ref(db, 'articles/'),orderByChild("created_at"), limitToLast(this.limitTo))
               }else{
-                this.showSpinner=true;
+                query_url= query(ref(db, 'articles/'),orderByChild("category"), startAt(this.cat), endAt(this.cat), limitToLast(this.limitTo))
               }
-              //get articles count from firestore
-              const coll = collection(db, "articles");
-              const countSnapshot=await getCountFromServer(coll);
-              const articlesCount=countSnapshot.data().count;
-              //end get articles count from firestore
-
-              //first display data from firestore
-              const first = query(collection(db, "articles"), orderBy("created_at", "desc"), limit(12));
-              let documentSnapshots = await getDocs(first);       
-              //end first display data from firestore
-
-              if(this.lastDoc !== null){      //check if first display of last item has or not
-                const next = query(collection(db, "articles"), orderBy("created_at", "desc"),startAfter(this.lastDoc), limit(12));
-                documentSnapshots=await getDocs(next)
-              }     
-              
-              //first display data of last item from firestore
-            const lastDoc = documentSnapshots.docs[documentSnapshots.docs.length-1];
-            this.lastDoc=lastDoc;  
-            //end first display data of last item from firestore
-                  
-              let data=documentSnapshots._snapshot.docChanges;
-                if(data.length <= 0 ){
-                    this.error="Oops..., something went wrong."
-                    this.hasArticles=false;                  
-                }else{
-                    let arts=[]
-                    documentSnapshots.forEach((doc) => {         
-                      let post = {
-                          id: doc.id,
-                          title: doc.data().title,
-                          content: doc.data().content,
-                          src: doc.data().src,
-                          category: doc.data().category,
-                      };
-                      arts.push(post);          
-                  
-                  });
-                      const newArticles=[...this.articles, ...arts]
-                      this.articles=newArticles;
-                      this.error=null;              
-
-                      if(articlesCount=== newArticles.length){
-                        this.hasArticles=false;
-                      }else{
-                        this.hasArticles=true;  
-                      }
-                      //store articles on vuex store;
-                      this.$store.dispatch("setArticles", {articles: newArticles, lastDoc: this.lastDoc, hasArticles: this.hasArticles})                
-                }
-
+             
+                onValue(query_url, (snapshot) => {
+                    const data = snapshot.val()
+                   
+                    this.btnSpinner=false;
+                    this.showSpinner=false;
+                    if(data ===null){
+                        this.articles=[]
+                        this.error="No article found."
+                    }else{
+                        const articles=Object.entries(data);
+                        this.articles=articles.reverse();   
+                        this.error=null;
+                        const count=Object.keys(data).length;
+                        if(this.articlesCount===count){
+                                this.isShowBtn=false;
+                        }else{
+                                this.isShowBtn=true;
+                        }
+                        }                   
+                })
             }catch(err){
-              this.error="Oops..., something went wrong.";
-              this.hasArticles=false;    
-            }finally{
-              this.showSpinner=false;
-              this.btnSpinner=false;
+              this.error="Oops..., something went wrong."
+               this.btnSpinner=false;
+           }finally{
+                
             }
-    },
+        },
 
-      viewDetails(id, title, img_url) {
+      viewDetails(id) { 
         this.$router.push({ name: "ArticleDetails", params: { id: id } });
       }, 
       

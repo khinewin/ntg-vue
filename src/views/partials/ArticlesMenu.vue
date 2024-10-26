@@ -8,7 +8,7 @@
                         <span>
                             <i class="fa-solid fa-house" ></i>
                         </span>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info" v-if="whoIsActive=='home' && !isSearch">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info" v-if="whoIsActive=='home'">
                             {{articles.length}}
                         </span>
                     </span>                                    
@@ -16,12 +16,10 @@
                 </button>
             </div>
             <div class="col-2 col-md-1 d-grid">
-                <button @click="handleSearchBox" :class="{'btn-dark': isShowSearchBox}" class="btn btn-sm btn-secondary">
+                <button @click="handleSearchBox"  class="btn btn-sm btn-secondary">
                     <span class="position-relative">
                         <i class="fa-solid fa-magnifying-glass" ></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info" v-if="isSearch">
-                            {{articles.length}}
-                        </span>
+                       
                     </span>
                      
                 </button>
@@ -34,9 +32,7 @@
                     </span>
                 </button>
             </div>
-            <div class="col-12" v-if="isShowSearchBox">
-                <input  type="search" @click="searchArticle=''" autofocus class="form-control" v-model="searchArticle" @keypress.enter="doSearch"   placeholder="Search the articles">
-            </div>
+          
          </div>
     </div>
 </template>
@@ -45,10 +41,10 @@ export default {
     props:['articles'],
     data(){
         return{
-            isShowSearchBox: false,
+           // isShowSearchBox: false,
             whoIsActive: "home",
-            searchArticle:"",
-            isSearch: false,
+          //  searchArticle:"",
+          //  isSearch: false,
             categories: [
             {id: 1, title: "Database", name : "database",active: false},
             {id: 2, title: "Programming", name : "programming",active: false},
@@ -58,41 +54,48 @@ export default {
         }
     },
 
-    created(){
-        
+    created(){     
 
-        if(this.$route.query.type != undefined){
-                this.whoIsActive=this.$route.query.type;
-        }
+        if(this.storeCategory !==null){
+                    this.whoIsActive=this.storeCategory;
+            }
         this.changeActive();
     },
 
-    
+    computed:{
+        storeCategory(){
+            return this.$store.getters.category;
+        }
+    },
     
   
     methods: {
+        
         handleSearchBox(){
             this.whoIsActive="home"
             this.changeActive();
            // this.isShowSearchBox =! this.isShowSearchBox
            this.$router.push({path:"/articles/search"})
         },
+        /*
         doSearch(){
             if(this.searchArticle){
                 this.isSearch=true
                 this.$emit("search-article", this.searchArticle)
             }            
         },
+        */
 
         changeActive(){
+           
        
-                this.categories.map((c)=>{
-                        if(c.name===this.whoIsActive){
-                            return c.active=true
-                        }else{
-                            return c.active=false;
-                        }
-                    }) 
+            this.categories.map((c)=>{
+                    if(c.name===this.whoIsActive){
+                        return c.active=true
+                    }else{
+                         return c.active=false;
+                    }
+                 }) 
         },
         articlesByCategory(name){
             //this.isShowSearchBox=false;
@@ -102,9 +105,9 @@ export default {
             this.$emit("category", name)         
         },
         goHome(){
-            this.isSearch=false;
+           // this.isSearch=false;
             //this.isShowSearchBox=false;
-            this.searchArticle="";
+          //  this.searchArticle="";
             this.whoIsActive="home"
             this.changeActive();
             this.$emit("category", "home")

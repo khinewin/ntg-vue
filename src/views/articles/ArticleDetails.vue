@@ -2,7 +2,7 @@
   <div class="home">
     <div class="container mt-4">
         <div v-if="error">
-          <ShowError :error="error" @tryAgain="tryAgain" class="article-error" />
+          <ShowError :error="error"  class="article-error" />
         </div>
       <div v-if="showSpinner">
           <PreLoading class="article-preloader" />
@@ -82,8 +82,8 @@
 </template>
 
 <script>
-import { collection, doc, setDoc, getDoc, query } from "firebase/firestore";
-import db from "@/firebase";
+//import { collection, doc, setDoc, getDoc, query } from "firebase/firestore";
+
 import { computed, onMounted, onUpdated, getCurrentInstance } from "vue";
 import { useHead } from "@unhead/vue";
 import VueLoadImage from "vue-load-image";
@@ -91,6 +91,8 @@ import ShowError from "@/views/partials/ShowError";
 import PreLoading from "@/views/loaders/PreLoading"
 import { useStore } from 'vuex'
 import ImageLoading from "@/views/loaders/ImageLoading"
+import { set, onValue, remove, ref, query, startAt,endAt, orderByChild } from 'firebase/database'
+import db from "@/firebase/database";
 
 export default {
   
@@ -154,10 +156,7 @@ export default {
       { immediate: true }
     )
   },
-  computed:{
-      articles(){
-        return this.$store.getters.articles;
-      },
+  computed:{    
       isAuth() {
       return this.$store.getters.isAuthenticated;
     },
@@ -169,51 +168,43 @@ export default {
     goHome() {
       this.$router.push("/");
     },
+   goArticles(){
+      this.$router.push({name: "AppArticles"})
+   },
 
-    goArticles(){
-      this.$router.push("/articles");
-    },    
-
-    async getArticle(){
-      if(this.articles.length > 0){
-          const article=this.articles.filter((a)=>{
-              return a.id === this.id;
-          })
-          let newArticle = {
-            id: article[0].id,
-            title: article[0].title,
-            content: article[0].content,
-            src: article[0].src,
-            category: article[0].category,
-          };  
-          this.article=newArticle;   
-        }
-
-        if(this.articles.length===0){
-          try{
-                this.showSpinner=true
-                const docRef = doc(db, "articles", this.id);
-                const docSnap = await getDoc(docRef);
-                let post = {
-                  id: docSnap.id,
-                  title: docSnap.data().title,
-                  content: docSnap.data().content,
-                  src: docSnap.data().src,
-                  category: docSnap.data().category,
-                };
-                this.error=null;
-                this.article=post;
-                
+     getArticle(){    
+      try{
+            this.showSpinner=true;
+            const query_url = query(ref(db, 'articles/' + this.id))
+                onValue(query_url, (snapshot) => {
+                  
+                    const data = snapshot.val()
+                    if(data ===null){
+                        this.$router.push({path: "/admin/articles"})
+                    }else{
+                        const article={
+                            id: this.id,
+                            title: data.title,
+                            category: data.category,
+                            src : data.src,
+                            content: data.content,
+                            created_at: data.created_at,
+                        }
+                        this.article=article;
+                        this.error=null;     
+                        this.showSpinner=false;      
+                        this.$store.dispatch("setArticle", {article: article})         
+                    }                   
+                })
             }catch(err){
-                //console.log(error.toString())
-                this.error="Oops..., Something went wrong."
-                
-            }finally{
-                this.showSpinner=false;
-            }
+              this.error="Oops..., something went wrong."
+               this.showSpinner=false;
+           }finally{
+
+           }
+     
         }
-        this.$store.dispatch("setArticle", {article: this.article})
-    }
+
   },
 
 };

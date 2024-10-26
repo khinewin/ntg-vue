@@ -2,50 +2,45 @@ import { ssrContextKey } from 'vue'
 import { createStore } from 'vuex'
 
 import { doc, setDoc, getDoc, collection, where, addDoc,limit, query, getDocs,orderBy, getCountFromServer } from "firebase/firestore"; 
-import db from "@/firebase"
+import db from "@/firebase/database"
+import fs from "@/firebase/firestore"
 import { text } from '@fortawesome/fontawesome-svg-core';
 
  const store= createStore({
   state: {
     user : {},
     isAuth:false,
-    postCount : 0,
-    studentRegistrationCount: 0,
-    studentsCount : 0,
-
-    posts :[],    
-
-    post : {},
-    postShowSpinner: false,
-    postError:null,
     
-    articles : [],
-    hasArticles: false,
-    lastDoc : null,
-
-    article : {},
-
     //contents count on menu
-    postsCount: 0,
+    coursesCount: 0,
     articlesCount: 0,
     studentsCount:0,
-    enrolledStudents:0,
+    enrolledCount:0,
+    studentsCount:0,
+    trainingsCount:0,
 
-    //admin courses
-    courses: [],
-    lastDocCourse : null,
-    hasCourses: false,
+    isNewUser: true,
+
 
     select_courses: [
-      {id: 1, course : "Computer Technology, CT-1", code: "ct1"},
-      {id: 2, course : "Computer Technology, CT-2", code: "ct2"},
-      {id: 8, course : "Computer Technology, CT-3", code: "ct3"},
-      {id: 3, course : "Programming Basic (From Zero To Moderate)", code: "pb1"},
-      {id: 4, course : "Web Development Level-1", code: "wd1"},
-      {id: 5, course : "Web Development Level-2", code: "wd2"},                   
-      {id: 6, course : "Basic Coding & Programming For Kids Level-1", code :"bcpkid1"},
-      {id: 7, course : "Basic Coding & Programming For Kids Level-2", code :"bcpkid2"},
+      {id: 1, course : "Computer Technology, CT-1", code: "ct1", course_fees: 70000, teacherFees: 0.70},
+      {id: 2, course : "Computer Technology, CT-2", code: "ct2", course_fees: 100000, teacherFees: 0.70},
+      {id: 8, course : "Computer Technology, CT-3", code: "ct3",course_fees: 150000, teacherFees: 0.07},
+      {id: 3, course : "Programming Basic (From Zero To Moderate)", code: "pb1", course_fees: 100000,teacherFees: 0.70},
+      {id: 4, course : "Web Development Level-1", code: "wd1", course_fees: 200000,teacherFees: 0.70},
+      {id: 5, course : "Web Development Level-2", code: "wd2", course_fees: 200000, teacherFees: 0.70},                   
+      {id: 6, course : "Basic Coding & Programming For Kids Level-1", code :"bcpkid1", course_fees: 150000, teacherFees: 0.70},
+      {id: 7, course : "Basic Coding & Programming For Kids Level-2", code :"bcpkid2", course_fees: 150000, teacherFees: 0.70},
 ],
+
+      //articles
+      articleLimitTo: 0,
+      category : null,
+      article : {},
+
+      //courses
+      course:{},
+      courseCategory: null,
 
   },
 
@@ -53,34 +48,28 @@ import { text } from '@fortawesome/fontawesome-svg-core';
     uid : state=> state.user.uid,
     email: state=>state.user.email,
     isAuthenticated : state=> !!state.isAuth,
-    postCount :state => state.postCount,
-    studentRegistrationCount : state => state.studentRegistrationCount,
-    studentsCount : state=>state.studentsCount,
+    
 
-    posts : state=>state.posts,
-   
-
-    post : state => state.post,
-    postShowSpinner : state => state.postShowSpinner,
-    postError : state => state.postError,
-
-    articles : state => state.articles,
-    hasArticles : state => state.hasArticles,
-    lastDoc : state => state.lastDoc,    
-
-    article : state =>state.article,
-
-    postsCount:state =>state.postsCount,
+    coursesCount:state =>state.coursesCount,
     articlesCount:state=>state.articlesCount,
     studentsCount:state =>state.studentsCount,
-    enrolledStudents:state=>state.enrolledStudents,
+    enrolledCount:state=>state.enrolledCount,
+    studentsCount:state=>state.studentsCount,
+    trainingsCount:state=>state.trainingsCount,
 
-    //admin courses
-    courses:state=>state.courses,
-    lastDocCourse:state=>state.lastDocCourse,
-    hasCourses:state => state.hasCourses,
+    select_courses:state=>state.select_courses,
 
-    select_courses:state=>state.select_courses
+    //article
+    articleLimitTo:state=>state.articleLimitTo,
+    category:state=>state.category,
+   // articles : state => state.articles,
+
+    //courses
+    course:state => state.course,
+    courseCategory:state=>state.courseCategory,
+
+    isNewUser:state=>state.isNewUser,
+
   },
 
   mutations: {
@@ -92,92 +81,90 @@ import { text } from '@fortawesome/fontawesome-svg-core';
         SET_LOGOUT_USER(state, payload){
           state.user={}
           state.isAuth=false;
-      },
-      SET_POST_COUNT(state, payload){
-          state.postCount=payload;
-      },
-      SET_STUDENT_REGISTRATION_COUNT(state, payload){
-        state.studentRegistrationCount=payload;
-      },
-      SET_STUDENTS_COUNT(state, payload){
-        state.studentsCount=payload;
-      },
+      },  
 
-      SET_POSTS(state, payload){
-          state.posts=payload;
-      },     
-      
-
-      SET_POST(state, payload){
-          state.post=payload
-      },
-      
-
-    //articles
-    SET_ARTICLES(state, payload){
-      state.articles=payload
-    }, 
-    SET_LAST_DOC(state, payload){
-      state.lastDoc=payload
+    SET_COURSES_COUNT(state, payload){
+        state.coursesCount=payload
     },
-    SET_HAS_ARTICLES(state, payload){
-      state.hasArticles=payload
+    SET_ARTICLES_COUNT(state, payload){
+      state.articlesCount=payload
     },
-    //articles
+    SET_ENROLLED_COUNT(state, payload){
+      state.enrolledCount=payload
+    },
+    SET_STUDENTS_COUNT(state, payload){
+      state.studentsCount=payload
+    },
+    SET_TRAININGS_COUNT(state, payload){
+      state.trainingsCount=payload
+    },
 
+   //article
+    SET_ARTICLE_LIMIT_TO(state, payload){
+        state.articleLimitTo=payload
+    },
+    SET_CATEGORY(state, payload){
+      state.category=payload
+    },
     SET_ARTICLE(state, payload){
       state.article=payload
     }, 
 
-    SET_CONTENTS_COUNT(state, payload){
-        state.postsCount=payload.posts;
-        state.articlesCount=payload.articles;
-        state.studentsCount=payload.students;
-        state.enrolledStudents=payload.enrolledStudents;
+    //course
+    SET_COURSE_CATEGORY(state, payload){
+      state.courseCategory=payload
     },
-
-    //admin courses
-    SET_COURSES(state, payload){
-      state.courses=payload.courses;
-      state.lastDocCourse=payload.lastDocCourse;
-      state.hasCourses=payload.hasCourses;
+    SET_COURSE(state, payload){
+      state.course=payload
     }, 
-   
-   
+
+   SET_IS_NEW_USER(state, payload){
+      state.isNewUser=payload;
+   }
   },
 
   actions: {
- 
-    setArticles(context, payload){
-        context.commit("SET_ARTICLES", payload.articles)
-        context.commit("SET_LAST_DOC", payload.lastDoc)
-        context.commit("SET_HAS_ARTICLES", payload.hasArticles)
+
+    setCoursesCount(context, payload){
+        context.commit("SET_COURSES_COUNT", payload)
+    },
+    setArticlesCount(context, payload){
+      context.commit("SET_ARTICLES_COUNT", payload)
+    },
+    setEnrolledCount(context,payload){
+      context.commit("SET_ENROLLED_COUNT", payload)
+    },
+    setStudentsCount(context,payload){
+      context.commit("SET_STUDENTS_COUNT", payload)
+    },
+    setTrainingsCount(context,payload){
+      context.commit("SET_TRAININGS_COUNT", payload)
     },
 
-    setArticle(context, payload){
-      context.commit("SET_ARTICLE", payload.article)
+
+    //articles
+    setArticleLimitTo(context, payload){
+        context.commit("SET_ARTICLE_LIMIT_TO", payload)
     },
-    setPost(context, payload){
-      context.commit("SET_POST", payload.post);
-    },
-    setPosts(context,payload){
-        context.commit("SET_POSTS", payload.posts);
+    setCategory(context, payload){
+      context.commit("SET_CATEGORY", payload)
+  },
+  setArticle(context, payload){
+    context.commit("SET_ARTICLE", payload.article)
+  },
+
+  //courses
+  setCourseCategory(context, payload){
+    context.commit("SET_COURSE_CATEGORY", payload)
+  },
+  setCourse(context, payload){
+    context.commit("SET_COURSE", payload)
+  },
+
+    setIsNewUser(context, payload){
+        context.commit("SET_IS_NEW_USER", payload)
     },
 
-    setContentsCount(context, payload){
-        context.commit("SET_CONTENTS_COUNT", 
-          {
-            posts: payload.posts,
-             articles: payload.articles, 
-             students: payload.students,
-             enrolledStudents:payload.enrolledStudents,
-            }
-          );
-    },
-
-    setCourses(context, payload){
-        context.commit("SET_COURSES", {courses: payload.courses, lastDocCourse: payload.lastDoc, hasCourses: payload.hasCourses})
-    },
 
 
     setLoginUser(context,payload){
@@ -186,26 +173,8 @@ import { text } from '@fortawesome/fontawesome-svg-core';
     setLogoutUser(context, payload){
       context.commit("SET_LOGOUT_USER", payload)
     },
-    async fetchDashboardCounts(context, payload){
-     
-      const coll = collection(db, "contents");
-      const snapshot = await getCountFromServer(coll);
-      context.commit("SET_POST_COUNT", snapshot.data().count)
+ 
 
-      const collEnrolledStu = collection(db, "enrolled_students");
-      const snapshotEnrolledStu = await getCountFromServer(collEnrolledStu);
-      context.commit("SET_STUDENT_REGISTRATION_COUNT", snapshotEnrolledStu.data().count)
-
-      const collStu = collection(db, "students");
-      const snapshotStu = await getCountFromServer(collStu);
-      context.commit("SET_STUDENTS_COUNT", snapshotStu.data().count)
-      /*
-      const q = query(collection(db, "contents"), orderBy("title", "desc"));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-      })
-      */
-    }
   },
   
 })

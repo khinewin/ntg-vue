@@ -1,35 +1,35 @@
 <template>
     <div class="home">
-      <div class="container my-4">    
+      <div class="container my-4 min-vh-100">    
          <!-- category -->
           <div class="row">        
             <div class="col-12">
               <div><button class="btn btn-lg mb-2" @click="goBack"><i class="fa-solid fa-circle-left"></i></button> <span class="h5"> Search articles</span> <span class=" badge rounded-pill bg-dark ms-4" style="font-size: 14px;" v-show="articles.length > 0">{{articles.length}}</span></div>
             </div>
             <div class="col-12">
-                    <input type="search" @click="searchArticle=''" autofocus class="form-control" v-model="searchArticle" @keypress.enter="searchArticles"   placeholder="Search">
+                    <input  id="searchArticle" type="search" @click="searchArticle=''" :disabled="showSpinner"  class="form-control" v-model="searchArticle" @keypress.enter="searchArticles"   placeholder="Search">
             </div>
           </div>
           
          <!-- end category -->
-          <div v-if="error" class="row ">
-                <div class="col-12 text-center  initial-search-result">
-                        {{error}}
+          <div  class="row">
+                <div class="col-12 mt-5" v-if="error">
+                        <ShowError :error="error" />
                 </div>
+                <div v-if="showSpinner" class="col-12 mt-5">          
+                  <PreLoading  />
+              </div>
+              <div class="col-12 mt-5" v-if="!error && !showSpinner && articles.length <=0 ">
+                    <div class="text-center">Enter the keyword in search box and press enter or go.</div>
+              </div>
           </div>
-         <div v-if="showSpinner">          
-            <PreLoading class="articles-preloader" />
-        </div>
-        <div class="row" v-if="message">
-            <div class="col-12 text-center initial-search-result" >
-                    Result is display here.
-            </div>
-        </div>
+         
+        
         <div class="row g-2" v-show="articles.length > 0" >
             <div class="col-12 my-2 pt-2">
                     Result for "<strong>{{oldKeyword}}"</strong>
             </div>
-          <div v-for="post in articles" :key="post.id" class="col-sm-6 col-md-3">
+          <div v-for="a in articles" :key="a[0]" class="col-sm-6 col-md-3">
             <!--start col-->
             <div class="card shadow border-0 bg-secondary  rounded" >
               <div
@@ -39,7 +39,7 @@
                   <div class="show-image-container  rounded">
                     <vue-load-image>
                       <template v-slot:image>
-                        <img :src="post.src" class="img-fluid show-image" @click="viewDetails(post.id, post.title, post.src)" />
+                        <img :src="a[1].src" class="img-fluid show-image" @click="viewDetails(a[0])" />
                       </template>
                       <template v-slot:preloader>
                           <ImageLoading />
@@ -53,14 +53,7 @@
             </div>
             <!--end col-->
           </div>
-          <div class="row justify-content-center mt-3" v-if="hasArticles">
-              <div class="col-sm-6 col-md-4 d-grid">
-                <button class="btn btn-primary rounded" type="button" :disabled="error || !hasArticles || btnSpinner" @click="fetchArticles">
-                  <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" v-if="btnSpinner"></span>
-                  More articles <i class="fa-solid fa-circle-chevron-down"></i>
-                </button>
-              </div>
-          </div>
+          
         </div>  
          
       </div>
@@ -75,9 +68,9 @@
   import ImageLoading from "@/views/loaders/ImageLoading"
   import ArticlesMenu from "@/views/partials/ArticlesMenu"
   import ShowError from "@/views/partials/ShowError"
-  import { doc, setDoc, getDoc, collection, where, addDoc,limit, query, getDocs, startAfter,orderBy, getCountFromServer } from "firebase/firestore"; 
-  import db from "@/firebase"
-  
+  //import { doc, setDoc, getDoc, collection, where, addDoc,limit, query, getDocs, startAfter,orderBy, getCountFromServer } from "firebase/firestore"; 
+  import db from "@/firebase/database"
+  import { getDatabase, ref, set, onValue, remove, query, startAt,endAt, orderByChild ,limitToLast, limitToFirst} from 'firebase/database'
   export default {
 
     
@@ -125,28 +118,21 @@
         showSpinner: false,      
         message:true,
         searchArticle:"",
-        oldKeyword:""
+        oldKeyword:"",
+         articlesData:[],
       };
     },
    
  
     created() {
-     
-    
+        this.preFetchArticles();
     },    
+    mounted() {
+      
+    },
 
     computed:{
-        /*
-        storeArticles(){
-          return this.$store.getters.articles;
-        },
-        storeLastDoc(){
-          return this.$store.getters.lastDoc
-        },
-        storeHasArticles(){
-          return this.$store.getters.hasArticles;
-        }
-          */
+      
     },   
     methods: {    
 
@@ -155,49 +141,44 @@
             this.$router.go(-1)          
       },      
 
-      async searchArticles(searchTitle){
-        
-        try{
-          this.error=false;
-          this.showSpinner=true;
-          this.message=false;  
-          this.oldKeyword=this.searchArticle;
-
-          const docsSnapshot = query(collection(db, "articles"), orderBy("created_at", "desc"), limit(40));
-          let documentSnapshots = await getDocs(docsSnapshot); 
-          let data=documentSnapshots._snapshot.docChanges;
-                if(data.length <= 0 ){
-                    this.error="Oops..., something went wrong.";
-                    this.hasArticles=false;                  
-                }else{ 
-                    let arts=[]
-                              documentSnapshots.forEach((doc) => {         
-                                let post = {
-                                    id: doc.id,
-                                    title: doc.data().title,
-                                    content: doc.data().content,
-                                    src: doc.data().src,
-                                    category: doc.data().category,
-                                };
-                                arts.push(post);  
-                              });
-                     const result=arts.filter((art)=>{
-                      return art.title.toLowerCase().includes(this.searchArticle.toLowerCase())
-                      })
-                      if(result.length === 0){
-                        this.error=`No result found for "${this.searchArticle}".`
-                        this.hasArticles=false; 
-                      }
-                    this.articles=result;    
-                }
-        }catch(err){
+      preFetchArticles(){
+     
+          try{
+            this.showSpinner=true;
+            const query_url=query(ref(db, 'articles/'))
+            onValue(query_url, (snapshot) => {
+                const data = snapshot.val()
+                this.showSpinner=false; 
+                if(data===null)  return null;        
+            
+                  const count=Object.keys(data).length;
+                  const arts=Object.entries(data);
+                 this.articlesData=arts;   
+            })
+          }catch(err){
               this.error="Oops..., something went wrong.";
-              this.hasArticles=false;    
-        }finally{
-              this.showSpinner=false;
-              this.searchArticle="";
-        }
-        
+          }finally{
+
+          }
+      },
+
+       searchArticles(searchTitle){
+                 this.error=null;
+                if(!this.searchArticle) return false;
+                
+                this.oldKeyword=this.searchArticle; 
+                this.articles=[];             
+            
+                const result=this.articlesData.filter((art)=>{
+                      return art[1].title.toLowerCase().includes(this.searchArticle.toLowerCase())
+                })
+                if(result.length === 0){
+                  this.error=`No result found for "${this.searchArticle}".`
+                }else{
+                  this.articles=result; 
+                }    
+                
+                this.searchArticle="";
       },
      
    

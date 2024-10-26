@@ -26,10 +26,10 @@
                                  <div class="col-sm-6">                             
                                     
                                         <form @submit.prevent="updateCourse">
-                                            <div class="text-danger small ms-2 mb-2" v-if="errors.content_id">{{errors.content_id}}</div>
+                                            <div class="text-danger small ms-2 mb-2" v-if="errors.course_id">{{errors.course_id}}</div>
                                             <div class="form-floating mb-3">                                                
-                                                <input @keydown="clearError('content_id')" type="number" class="form-control form-control-sm" v-model="content_id" :class="{'is-invalid' : errors.content_id}" id="title" placeholder="ID" >
-                                                <label for="content_id" class="small">ID</label>
+                                                <input @keydown="clearError('course_id')" type="number" class="form-control form-control-sm" v-model="course_id" :class="{'is-invalid' : errors.course_id}" id="title" placeholder="ID" >
+                                                <label for="course_id" class="small">ID</label>
                                             </div>
 
                                             <div class="text-danger small ms-2 mb-2" v-if="errors.title">{{errors.title}}</div>
@@ -60,10 +60,10 @@
                                             </div>                                   
                                        
                                            
-                                            <div class="text-danger small ms-2 mb-2" v-if="errors.text_body">{{errors.text_body}}</div>
+                                            <div class="text-danger small ms-2 mb-2" v-if="errors.content">{{errors.content}}</div>
                                             <div class="mb-3">
-                                                <label for="text_body" class="small">Content body</label>
-                                                <ckeditor  :editor="editor" :config="editorConfig"  @keydown="clearError('text_body')" v-model="text_body" id="text_body"  placeholder="Content body"></ckeditor>
+                                                <label for="content" class="small">Content body</label>
+                                                <ckeditor  :editor="editor" :config="editorConfig"  @keydown="clearError('content')" v-model="content" id="content"  placeholder="Content body"></ckeditor>
                                             </div>
                                             <div class="mb-3">
                                                 <button type="submit" class="btn btn-primary btn-lg me-2" :class="{disabled: isLoading}">
@@ -85,10 +85,11 @@
 </template>
 <script>
 import SideBar from '@/views/admin/partials/SideBar.vue'
-import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
-import db from "@/firebase"
+//import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
+import db from "@/firebase/database"
 import { ClassicEditor, Bold, Essentials, Italic, Mention, Paragraph, Undo, Image, ImageInsert, Link, List, MediaEmbed ,Table, TableToolbar,TableCellProperties, TableProperties, } from 'ckeditor5';
 import CKEditor from '@ckeditor/ckeditor5-vue';
+import {ref, set, onValue, remove, query, startAt,endAt, orderByChild } from 'firebase/database'
 
 export default {
     
@@ -108,20 +109,20 @@ export default {
             title: "",
             src:"",
             category:"",
-            text_body:"",
+            content:"",
             category:"",
             course_fees:"",
-            content_id:"",
+            course_id:"",
             message:null,
 
             error:{
                 title: "",
                 src:"",
                 category:"",
-                text_body:"",
+                content:"",
                 category:"",
                 course_fees:"",
-                content_id:"",
+                course_id:"",
             },
 
             editor: ClassicEditor,
@@ -139,7 +140,7 @@ export default {
          
             errors: {
                 src: "",
-                text_body: "",
+                content: "",
                 title: "",
               
             },
@@ -147,22 +148,10 @@ export default {
         }
     },
    mounted() {
-    if(this.courses.length === 0){
-        this.$router.go(-1)
-    }
+   
     this.getCourse();
    },
-   computed:{
-        courses(){
-            return this.$store.getters.courses;
-        },
-        storeLastDoc(){
-            return this.$store.getters.lastDocCourse;
-        },
-        storeHasCourses(){
-            return this.$store.getters.hasCourses;
-        }
-   },
+ 
     methods:{      
         onReady( editor ) {
        // console.log( "CKEditor5 Vue Component is ready to use!", editor );
@@ -172,41 +161,48 @@ export default {
        // console.log( data );
       },
      
-      getCourse(){
-            if(this.courses.length > 0){
-                const course=this.courses.filter((c)=>c.id===this.id)
-                this.content_id=course[0].content_id;
-                this.title=course[0].title;
-                this.src=course[0].src;
-                this.course_fees=course[0].course_fees;
-                this.category=course[0].category;
-                this.text_body=course[0].content;
+      getCourse(){            
+        try{
+            //this.showSpinner=true;
+            const query_url = query(ref(db, 'courses/' + this.id))
+                onValue(query_url, (snapshot) => {
+                    const data = snapshot.val()
+                    if(data ===null){
+                        this.$router.push({path: "/admin/articles"})
+                    }else{
+                        this.title=data.title;
+                        this.category=data.category;
+                        this.src=data.src;
+                        this.content=data.content;
+                        this.created_at=data.created_at;      
+                        this.course_fees=data.course_fees;
+                        this.course_id=data.course_id                  
+                    }                   
+                })
+            }catch(err){
+               // this.error="Oops..., something went wrong."
+            }finally{
+               
             }
+    
             
       },
         async updateCourse(){
           
                 this.checkValidation();
-                if(!this.errors.src && !this.errors.text_body && !this.errors.title && !this.errors.content_id && !this.errors.category && !this.errors.course_fees){
+                if(!this.errors.src && !this.errors.content && !this.errors.title && !this.errors.course_id && !this.errors.category && !this.errors.course_fees){
                     this.isLoading=true;                  
-                    const saveDoc=doc(db, "contents", this.id)
-                    await setDoc(saveDoc, {
-                            title: this.title,
-                            src: this.src,
-                            category: this.category, 
-                            course_fees: this.course_fees,
-                            text_body: this.text_body,
-                            content_id: this.content_id                      
-                    
-                        }).then(()=>{
-                           
+                        const course={title: this.title, src: this.src, category: this.category, course_fees: this.course_fees, course_id: this.course_id, content: this.content, created_at: this.created_at }
+                        const query_url = ref(db, 'courses/' + this.id)
+                        set(query_url, course)
+                        .then(()=>{                           
                             this.isLoading=false;           
-                            this.message="The course has been updated."                  
+                            this.message="The course has been updated."                 
 
                         })
-                  
-               
-                
+                        .catch((err)=>{
+                            //console.log(err)
+                        })                    
             }
         },
         clearError(error){
@@ -214,8 +210,8 @@ export default {
                         case "title":
                             this.errors.title="";
                             break;
-                         case "text_body":
-                            this.errors.text_body="";
+                         case "content":
+                            this.errors.content="";
                             break;
                          case "course_fees":
                             this.errors.course_fees="";                           
@@ -226,26 +222,26 @@ export default {
                          case "src":
                             this.errors.src="";                           
                             break;   
-                        case "content_id":
-                            this.errors.content_id="";                           
+                        case "course_id":
+                            this.errors.course_id="";                           
                             break;    
                 }
         },
         checkValidation(){
-            if(!this.content_id){
-                    this.errors.content_id="The ID field is required.";
+            if(!this.course_id){
+                    this.errors.course_id="The ID field is required.";
             }else{
-                this.errors.content_id="";
+                this.errors.course_id="";
              } 
             if(!this.title){
                     this.errors.title="The title field is required.";
             }else{
                 this.errors.title="";
              }   
-             if(!this.text_body){
-                    this.errors.text_body="The content body field is required.";
+             if(!this.content){
+                    this.errors.content="The content body field is required.";
             }else{
-                this.errors.text_body="";
+                this.errors.content="";
              }   
              if(!this.src){
                     this.errors.src="The image URL field is required.";

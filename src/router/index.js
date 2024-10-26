@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory, createWebHashHistory, createMemoryHistory } from 'vue-router'
 import HomeView from '@/views/home/HomeView.vue'
-import PostDetails from "@/views/home/PostDetails.vue"
+import CourseDetails from "@/views/home/CourseDetails.vue"
+import StudentDetails from "@/views/home/StudentDetails"
+import ViewCertificate from "@/views/home/ViewCertificate.vue"
+
 import AppLogin from "@/views/auth/AppLogin.vue"
 import store  from '@/store/index.js'
 
@@ -11,9 +14,10 @@ import EnrolledStudentsVue from '@/views/admin/students/EnrolledStudents.vue'
 import AppStudents from "@/views/admin/students/AppStudents.vue"
 import AppNewStudent from "@/views/admin/students/AppNewStudent.vue"
 import AppEditStudent from '@/views/admin/students/AppEditStudent.vue'
+import StudentInfo from '@/views/admin/students/StudentInfo.vue'
 
-import AppIncomeStatement from '@/views/admin/shared/AppIncomeStatement.vue'
-import AppSpendingTask from '@/views/admin/shared/AppSpendingTask.vue'
+import CashBook from '@/views/admin/shared/CashBook.vue'
+import AppExpenditureTask from '@/views/admin/shared/AppExpenditureTask.vue'
 import AppRevenueTask from '@/views/admin/shared/AppRevenueTask.vue'
 import AppSharedStatement from '@/views/admin/shared/AppSharedStatement.vue'
 
@@ -31,11 +35,27 @@ import NewCourse from '@/views/admin/courses/NewCourse.vue'
 import ShowCourses from '@/views/admin/courses/ShowCourses.vue'
 import EditCourse from '@/views/admin/courses/EditCourse.vue'
 
+import PageNotFound from '@/views/partials/PageNotFound.vue'
+
 const routes = [
+  { 
+    path: '/:pathMatch(.*)*',
+    component: PageNotFound,
+  },
   {
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/students/:id',
+    name: 'StudentDetails',
+    component: StudentDetails
+  },
+  {
+    path: '/students/:id/certificate/:cert_src',
+    name: 'ViewCertificate',
+    component: ViewCertificate
   },
   {
     path: '/articles',
@@ -56,12 +76,12 @@ const routes = [
     component: ArticleDetails,
   },
   {
-    path: '/post/:id',
-    name: 'PostDetails',
+    path: '/course/:id',
+    name: 'CourseDetails',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: PostDetails,
+    component: CourseDetails,
   },
   {
     path: "/student-registration",
@@ -72,7 +92,7 @@ const routes = [
     path: "/app-login",
     component : AppLogin,
     name: "AppLogin",
-    meta : {guest: false}
+    meta : {guest: true}
   },
   {
     path: "/admin/dashboard",
@@ -81,7 +101,7 @@ const routes = [
     meta : {requiresAuth : true}
   },
   {
-    path: "/admin/enrolled-students",
+    path: "/admin/students/enrolled",
     component: EnrolledStudentsVue,
     name: "EnrolledStudents",
     meta : {requiresAuth : true}
@@ -90,18 +110,24 @@ const routes = [
     path: "/admin/students",
     component: AppStudents,
     name: "AppStudents",
-    meta : {requiresAuth : true}
+    meta : {requiresAuth : false}
   },
   {
-    path: "/admin/new-student",
+    path: "/admin/students/new",
     component: AppNewStudent,
     name: "AppNewStudent",
-    meta : {requiresAuth : true}
+    meta : {requiresAuth : false}
   },
   {
-    path: "/admin/edit-student/:id", 
+    path: "/admin/students/:id/edit", 
     component: AppEditStudent,
     name: "AppEditStudent",
+    meta : {requiresAuth :true}
+  },
+  {
+    path: "/admin/students/:id/details", 
+    component: StudentInfo,
+    name: "StudentInfo",
     meta : {requiresAuth :true}
   },
   {
@@ -127,32 +153,32 @@ const routes = [
     path: "/admin/articles/new", 
     component: NewArticle,
     name: "NewArticle",
-    meta : {requiresAuth :false}
+    meta : {requiresAuth :true}
   },
   {
     path: "/admin/articles", 
     component: ShowArticles,
     name: "ShowArticles",
-    meta : {requiresAuth :false}
+    meta : {requiresAuth :true}
   },
   {
     path: "/admin/articles/:id/edit", 
     component: EditArticle,
     name: "EditArticle",
-    meta : {requiresAuth :false}
-  },
-
-
-  {
-    path: "/admin/income-statement", 
-    component: AppIncomeStatement,
-    name: "IncomeStatement",
     meta : {requiresAuth :true}
   },
+
+
   {
-    path: "/admin/spanding-task", 
-    component: AppSpendingTask,
-    name: "AppSpendingTask",
+    path: "/admin/cashbook", 
+    component: CashBook,
+    name: "CashBook",
+    meta : {requiresAuth :false}
+  },
+  {
+    path: "/admin/expenditure-task", 
+    component: AppExpenditureTask,
+    name: "AppExpenditureTask",
     meta : {requiresAuth :true}
   },
   {
@@ -162,10 +188,10 @@ const routes = [
     meta : {requiresAuth :true}
   },
   {
-    path: "/admin/shared-statement", 
+    path: "/admin/shares/statement", 
     component: AppSharedStatement,
     name: "AppSharedStatement",
-    meta : {requiresAuth :true}
+    meta : {requiresAuth :false}
   }
 ]
 

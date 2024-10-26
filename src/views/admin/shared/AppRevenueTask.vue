@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="container-fluid home">
+    <div class="container-fluid home min-vh-100">
     <div class="row">          
             <div class="col-md-12 content-block" style="min-height: 500px">
                 <div class="row my-2">
@@ -15,12 +15,9 @@
                             <h4 class="h4">Revenue Task</h4>
                         </div>
                         
-                         <div class="col-12 col-md-4">
-                              <router-link to="/admin/income-statement" class="btn btn-link"> Income Statement</router-link>
-                         </div>
                 </div>
                 
-                 <div class="card shadow-sm mb-4">
+                 <div class="card shadow-sm mb-2 min-vh-100">
                         <div class="card-body">
                             <div class="row my-2 justify-content-center">
                                  <div class="col-sm-6">                             
@@ -44,6 +41,8 @@
                                                         <span class="visually-hidden">Loading...</span>
                                                      </div>
                                                     Save</button>
+                                                    <router-link to="/admin/cashbook" class="btn float-end"><i class="fa-solid fa-money-bill-transfer"></i> Cash book</router-link>
+
                                             </div>
                                     </form>
                                     
@@ -57,10 +56,11 @@
 </template>
 <script>
 import SideBar from "@/views/admin/partials/SideBar.vue"
-import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
-import db from "@/firebase"
+//import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
+import db from "@/firebase/database"
+import { ref, set, onValue, remove, query, startAt,endAt, orderByChild ,limitToLast, limitToFirst} from 'firebase/database'
 
-  import { Timestamp } from "firebase/firestore";
+//import { Timestamp } from "firebase/firestore";
 
 export default {
     name : "AppRevenueTask",
@@ -90,20 +90,16 @@ export default {
 
            if(!this.errors.task_at && !this.errors.task_name && !this.errors.amount){
             this.isLoading=true;
-            let new_task_at=Timestamp.fromDate(new Date(this.task_at));
-            
-            const saveCollection=collection(db, "revenue_task", )
-                    let saveData=await addDoc(saveCollection, {  
-                        task_name: this.task_name,
-                        amount: this.amount, 
-                        task_at: new_task_at
-                    })
-                    if(saveData.id){
-                        this.task_at="",
-                        this.task_name="",
-                        this.amount="",
-                        this.isLoading=false;
-                    }
+            const new_task_at=+ new Date(this.task_at)
+            const id=Date.now();
+            const query_url=query(ref(db,"revenues/" + id))
+            const data= { task_name : this.task_name, amount: this.amount, task_at : new_task_at}
+            set(query_url, data).then(()=>{
+                this.task_at="",
+                    this.task_name="",
+                    this.amount="",
+                    this.isLoading=false;
+            })           
                         
            }
             

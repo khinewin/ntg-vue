@@ -1,8 +1,8 @@
 <template>
-  <div class="home">
+  <div class="home min-vh-100">
     <div class="container mt-4">
       <div v-if="error">
-        <ShowError :error="error"  @tryAgain="tryAgain" class="post-detail-error"/>
+        <ShowError :error="error"   class="post-detail-error"/>
       </div>   
       <div v-if="showSpinner">
         <PreLoading class="post-detail-preloader"/>
@@ -13,7 +13,7 @@
           <div class="card shadow-sm border-0" >
             <vue-load-image>
               <template v-slot:image>
-                <img :src="post.src" class="img-fluid" />
+                <img :src="course.src" class="img-fluid" />
               </template>
               <template v-slot:preloader>
                     <ImageLoading/>
@@ -23,9 +23,9 @@
             <!--  <img :src="post.src" class="card-img-top" :alt="post.title"> -->
             <div class="card-body px-5">
               <h5 class="card-title text-center mb-4  lh-base">
-                {{ post.title }}
+                {{ course.title }}
               </h5>
-              <p v-html="post.text_body" class="text-wrap lh-lg"></p>
+              <p v-html="course.content" class="text-wrap lh-lg"></p>
               <div class="my-4">
                 <AppAddress />
               </div>
@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { collection, doc, setDoc, getDoc, query } from "firebase/firestore";
+//import { collection, doc, setDoc, getDoc, query } from "firebase/firestore";
 import { computed, onMounted, onUpdated, getCurrentInstance } from "vue";
 import { useHead } from "@unhead/vue";
 import VueLoadImage from "vue-load-image";
@@ -82,7 +82,8 @@ import AvailableCourse from "@/views/partials/AvailableCourse"
 import ImageLoading from "@/views/loaders/ImageLoading"
 import PreLoading from "@/views/loaders/PreLoading"
 import ShowError from "@/views/partials/ShowError"
-import db from "@/firebase";
+import db from "@/firebase/database";
+import { getDatabase, ref, set, onValue, remove, query, startAt,endAt, orderByChild ,limitToLast, limitToFirst} from 'firebase/database'
 
 export default {
   setup() {
@@ -91,7 +92,7 @@ export default {
 
     function createHeader(){    
      const store = useStore()     
-      const myPost = computed(() => store.getters.post)    
+      const myPost = computed(() => store.getters.course)    
       const id=myPost.value.id;
       const title=myPost.value.title;
       const src=myPost.value.src;     
@@ -120,7 +121,7 @@ export default {
     }
   },
 
-  name: "PostDetails",
+  name: "CourseDetails",
   components: {
     "vue-load-image": VueLoadImage,
     AppAddress, AvailableCourse, ImageLoading,PreLoading, ShowError
@@ -131,88 +132,62 @@ export default {
       id: this.$route.params.id,
       error: null,
       showSpinner :false,
-      post:{},
+      course:{},
     };
   },
 
   created() {    
-
      
         this.$watch(
         () => this.$route,
-        this.getPost,       
+        this.getCourse,       
         { immediate: true }
-        )
-    
+        )  
     
   },
-
-
-
-
-
   computed:{
-      posts(){
-        return this.$store.getters.posts;
-      }
+      
   },
-
   methods: {
    
-    tryAgain(){
-        this.getPost()
-    },
-    
     goHome() {
       this.$router.go(-1);
       //this.$router.go(-1)
     },
-    async getPost(){
-      if(this.posts.length > 0){
-          const post=this.posts.filter((a)=>{
-              return a.id === this.id;
-          })
-          let newPost = {
-            id: post[0].id,
-            title: post[0].title,
-            text_body: post[0].text_body,
-            src: post[0].src,
-            category: post[0].category,
-            course_fees:post[0].course_fees
-          };
-          
-          this.post=newPost;   
-        }
-
-        if(this.posts.length===0){
-         
-          try{
-                this.showSpinner=true
-                this.error=null;
-
-                const docRef = doc(db, "contents", this.id);
-                const docSnap = await getDoc(docRef);
-                let post = {
-                  id: docSnap.id,
-                  title: docSnap.data().title,
-                  text_body: docSnap.data().text_body,
-                  src: docSnap.data().src,
-                  category: docSnap.data().category,
-                  course_fees:docSnap.data().course_fees
-                };
-                this.error=null;
-                this.post=post;
-                
+   
+    getCourse(){    
+      try{
+            this.showSpinner=true;
+            const query_url = query(ref(db, 'courses/' + this.id))
+                onValue(query_url, (snapshot) => {                  
+                    const data = snapshot.val()
+                    if(data ===null){
+                        this.$router.push({path: "/"})
+                    }else{
+                        const course={
+                            id: this.id,
+                            title: data.title,
+                            category: data.category,
+                            src : data.src,
+                            content: data.content,
+                            created_at: data.created_at,
+                            course_id:data.course_id,
+                            course_fees:data.course_fees
+                        }
+                        this.course=course;
+                        this.error=null;     
+                        this.showSpinner=false;      
+                      this.$store.dispatch("setCourse", course)       
+                    }                   
+                })
             }catch(err){
-                //console.log(error.toString())
-                this.error="Oops..., Something went wrong."
-                
-            }finally{
-                this.showSpinner=false;
-            }
+              this.error="Oops..., something went wrong."
+               this.showSpinner=false;
+           }finally{
+
+           }
+     
         }
-        this.$store.dispatch("setPost", {post: this.post})
-    }
     
   },
 };

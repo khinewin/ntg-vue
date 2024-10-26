@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="container-fluid home">
+    <div class="container-fluid home min-vh-100">
     <div class="row">           
             <div class="col-md-12 content-block" style="min-height: 500px">
                 <div class="row my-2">
@@ -20,12 +20,12 @@
                         </div>
                 </div>
                 
-                 <div class="card shadow-sm mb-2">
+                 <div class="card shadow-sm mb-2 min-vh-100">
                         <div class="card-body">
                             <div class="row my-2 justify-content-center">
                                  <div class="col-sm-6">                             
                                     
-                                        <form @submit.prevent="updateCourse">
+                                        <form @submit.prevent="updateArticle">
                                         
 
                                             <div class="text-danger small ms-2 mb-2" v-if="errors.title">{{errors.title}}</div>
@@ -65,7 +65,7 @@
                                                     </button>
                                                     <button @click="goPublic" class="btn  float-end" :class="{disabled: isLoading}"><i class="fa-solid fa-earth-asia"></i> Public</button>
 
-                                                    <router-link to="/admin/articles" class="btn  float-end" :class="{disabled: isLoading}"><i class="fa-solid fa-pen-nib"></i> Articles</router-link>
+                                                    <button @click="goArticles" class="btn  float-end" :class="{disabled: isLoading}"><i class="fa-solid fa-pen-nib"></i> Articles</button>
                                             </div>
                                         </form>
                                     </div>
@@ -78,10 +78,11 @@
 </template>
 <script>
 import SideBar from '@/views/admin/partials/SideBar.vue'
-import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
-import db from "@/firebase"
+//import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
+import db from "@/firebase/database"
 import { ClassicEditor, Bold, Essentials, Italic, Mention, Paragraph, Undo, Image, ImageInsert, Link, List, MediaEmbed ,Table, TableToolbar,TableCellProperties, TableProperties, } from 'ckeditor5';
 import CKEditor from '@ckeditor/ckeditor5-vue';
+import {ref, set, onValue, remove, query, startAt,endAt, orderByChild } from 'firebase/database'
 
 
 export default {
@@ -147,68 +148,62 @@ export default {
             isLoading: false,
         }
     },
-   mounted() {
-    if(this.courses.length === 0){
-        this.$router.go(-1)
-    }
-    this.getCourse();
+   created() {   
+        this.getArticle();
    },
    computed:{
-        courses(){
-            return this.$store.getters.courses;
-        },
-        storeLastDoc(){
-            return this.$store.getters.lastDocCourse;
-        },
-        storeHasCourses(){
-            return this.$store.getters.hasCourses;
-        }
+      
    },
     methods:{      
+      goArticles(){
+            this.$router.push({name: "ShowArticles"})
+      } , 
       goPublic(e){
             e.preventDefault();        
             this.$router.push({ name: "ArticleDetails", params: { id: this.id } });  
       },
      
-      getCourse(){
-            if(this.courses.length > 0){
-                const course=this.courses.filter((c)=>c.id===this.id)
-                this.title=course[0].title;
-                this.src=course[0].src;
-                this.category=course[0].category;
-                this.content=course[0].content;
-                this.created_at=course[0].created_at
+      getArticle(){            
+        try{
+            //this.showSpinner=true;
+            const query_url = query(ref(db, 'articles/' + this.id))
+                onValue(query_url, (snapshot) => {
+                    const data = snapshot.val()
+                    if(data ===null){
+                        this.$router.push({path: "/admin/articles"})
+                    }else{
+                        this.title=data.title;
+                        this.category=data.category;
+                        this.src=data.src;
+                        this.content=data.content;
+                        this.created_at=data.created_at;                        
+                    }                   
+                })
+            }catch(err){
+               // this.error="Oops..., something went wrong."
+            }finally{
+               
             }
+    
             
       },
-        async updateCourse(){
-          
+        async updateArticle(){          
                 this.checkValidation();
                 if(!this.errors.src && !this.errors.content && !this.errors.title  && !this.errors.category){
-                    this.isLoading=true;                  
-                    const saveDoc=doc(db, "articles", this.id)
-                  
-                    await setDoc(saveDoc, {
-                            title: this.title,
-                            src: this.src,
-                            category: this.category, 
-                            content: this.content,
-                            created_at:this.created_at
-                    
-                        }).then(()=>{
-                           
+                    this.isLoading=true;                
+                 
+                        const article={title: this.title, src: this.src, category: this.category, content: this.content, created_at: this.created_at }
+                        const query_url = ref(db, 'articles/' + this.id)
+                        set(query_url, article)
+                        .then(()=>{                           
                             this.isLoading=false;           
-                            this.message="The article has been updated."                  
+                            this.message="The article has been updated."                 
 
                         })
                         .catch((err)=>{
                             //console.log(err)
-                        })
-                          
-                  
-               
-                
-            }
+                        })                  
+                }
         },
         clearError(error){
                 switch(error){

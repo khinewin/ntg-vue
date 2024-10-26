@@ -3,7 +3,7 @@
         <div class="row justify-content-center">
           <div class="col-12">
             <h3 class="text-center text-danger">{{error}}</h3>  
-            <div class="text-center">Waiting  for backend server <strong>00:{{remainSec < 10 ? "0":""}}{{remainSec}}</strong></div>            
+           <!-- <div class="text-center">Waiting  for backend server <strong>00:{{remainSec < 10 ? "0":""}}{{remainSec}}</strong></div> -->
           </div>
           <div class="col-sm-4 col-md-2 d-grid">
             
@@ -22,7 +22,7 @@ export default {
     },
 
     created(){
-        let interval=setInterval(this.myTime, 1000)
+       // let interval=setInterval(this.myTime, 1000)
        
     },
 

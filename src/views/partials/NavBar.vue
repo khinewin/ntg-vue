@@ -30,7 +30,7 @@
                 >
                   <span role="button" data-bs-dismiss="offcanvas"  class="d-block">
                     <i class="fa-solid fa-network-wired"></i> Courses  
-                    <span class="badge badge-pill bg-dark">{{postsCount}}</span>
+                    <span class="badge badge-pill bg-dark">{{coursesCount}}</span>
                   </span>
                 </router-link
               >
@@ -138,8 +138,8 @@ export default {
   },
 
   computed:{
-      postsCount(){
-        return this.$store.getters.postsCount;
+      coursesCount(){
+        return this.$store.getters.coursesCount;
       },
       articlesCount(){
         return this.$store.getters.articlesCount;

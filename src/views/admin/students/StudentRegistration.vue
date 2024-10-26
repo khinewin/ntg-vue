@@ -1,5 +1,5 @@
 <template>
-    <div class="container home">
+    <div class="container home min-vh-100">
             <div class="row justify-content-center">
                 <div class="col-md-6 mt-2 mb-4">
                         <div class="card shadow-sm">
@@ -94,8 +94,9 @@
             <!--end loading modal-->
 </template>
 <script>
-import { doc, setDoc, collection, addDoc } from "firebase/firestore"; 
-import db from "@/firebase"
+//import { doc, setDoc, collection, addDoc } from "firebase/firestore"; 
+import db from "@/firebase/database"
+import { getDatabase, ref, set, onValue, remove,query, startAt, endAt, orderByChild } from 'firebase/database'
 
 export default {
     name: "StudentRegistration",
@@ -104,18 +105,9 @@ export default {
             name: "",
             email: "",
             phone:"",
-            education:"",
-            select_course: [
-                    {id: 1, course : "Computer Technology, CT-1", code: "ct1"},
-                    {id: 2, course : "Computer Technology, CT-2", code: "ct2"},
-                    {id: 8, course : "Computer Technology, CT-3", code: "ct3"},
-                    {id: 3, course : "Programming Basic (From Zero To Moderate)", code: "pb1"},
-                    {id: 4, course : "Web Development Level-1", code: "wd1"},
-                    {id: 5, course : "Web Development Level-2", code: "wd2"},                   
-                    {id: 6, course : "Basic Coding & Programming For Kids Level-1", code :"bcpkid1"},
-                    {id: 7, course : "Basic Coding & Programming For Kids Level-2", code :"bcpkid2"},
-            ],
+            education:"",           
             course: "",
+
             errors: {
                 name: "",
                 email: "",
@@ -135,6 +127,12 @@ export default {
         }
     },
     created(){
+    },
+
+    computed:{
+        select_course(){
+            return this.$store.getters.select_courses;
+        }
     },
 
     methods:{
@@ -185,32 +183,34 @@ export default {
                 this.isLoading=true;
                 this.toggleLoadingModal("show");
                 this.showSpinner=true
-                const saveCollection=collection(db, "enrolled_students")
-              let saveData=await addDoc(saveCollection, {
-                name: this.name,
-                email: this.email,
-                phone : this.phone,
-                education: this.education,
-                course: this.course,
-                created_at : new Date().toLocaleDateString() + ", " + new Date().toLocaleTimeString(),
-                order_date: new Date(),
+                const data={
+                    name: this.name,
+                    email: this.email,
+                    phone : this.phone,
+                    education: this.education,
+                    course: this.course,
+                    created_at: Date.now(),
+                }
+                
+                const id = Date.now()
+                const query = ref(db, 'enrolledStudents/' + id)
+                set(query, data).then(()=>{
+                    this.student.name=this.name;
+                    this.student.email=this.email;
+                    this.student.phone=this.phone;
+                    this.student.course=this.course;
+
+                    this.name="";
+                    this.email="";
+                    this.phone="";
+                    this.education="";
+                    this.course="";
+                    this.showSpinner=false;
+                    this.isLoading=false;
+                }).catch(()=>{
+
                 })
-               if(saveData.id){
-                this.isLoading=false;
-                this.student.name=this.name;
-                this.student.email=this.email;
-                this.student.phone=this.phone;
-                this.student.course=this.course;
-
-                this.name="";
-                this.email="";
-                this.phone="";
-                this.education="";
-                this.course="";
-                this.showSpinner=false;
-               }
-
-            
+                
             }
             
         },

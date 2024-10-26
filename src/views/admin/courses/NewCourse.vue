@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="container-fluid home">
+    <div class="container-fluid home min-vh-100">
     <div class="row">           
             <div class="col-md-12 content-block" style="min-height: 500px">
                 <div class="row my-2">
@@ -20,16 +20,16 @@
                         </div>
                 </div>
                 
-                 <div class="card shadow-sm mb-2">
+                 <div class="card shadow-sm mb-2 min-vh-100">
                         <div class="card-body">
                             <div class="row my-2 justify-content-center">
                                  <div class="col-sm-6">                             
                                     
-                                        <form @submit.prevent="savePost">
-                                            <div class="text-danger small ms-2 mb-2" v-if="errors.content_id">{{errors.content_id}}</div>
+                                        <form @submit.prevent="saveCourse">
+                                            <div class="text-danger small ms-2 mb-2" v-if="errors.course_id">{{errors.course_id}}</div>
                                             <div class="form-floating mb-3">                                                
-                                                <input @keydown="clearError('content_id')" type="number" class="form-control form-control-sm" v-model="content_id" :class="{'is-invalid' : errors.content_id}" id="title" placeholder="ID" >
-                                                <label for="content_id" class="small">ID</label>
+                                                <input @keydown="clearError('course_id')" type="number" class="form-control form-control-sm" v-model="course_id" :class="{'is-invalid' : errors.course_id}" id="title" placeholder="ID" >
+                                                <label for="course_id" class="small">ID</label>
                                             </div>
 
                                             <div class="text-danger small ms-2 mb-2" v-if="errors.title">{{errors.title}}</div>
@@ -60,10 +60,10 @@
                                             </div>                                   
                                        
                                            
-                                            <div class="text-danger small ms-2 mb-2" v-if="errors.text_body">{{errors.text_body}}</div>
+                                            <div class="text-danger small ms-2 mb-2" v-if="errors.content">{{errors.content}}</div>
                                             <div class="mb-3">
-                                                <label for="text_body" class="small">Content body</label>
-                                                <ckeditor  :editor="editor" :config="editorConfig"   @keydown="clearError('text_body')" v-model="text_body" id="text_body"  placeholder="Content body"></ckeditor>
+                                                <label for="content" class="small">Content body</label>
+                                                <ckeditor  :editor="editor" :config="editorConfig"   @keydown="clearError('content')" v-model="content" id="content"  placeholder="Content body"></ckeditor>
                                             </div>
                                             <div class="mb-3">
                                                 <button type="submit" class="btn btn-primary btn-lg me-2" :class="{disabled: isLoading}">
@@ -85,10 +85,11 @@
 </template>
 <script>
 import SideBar from '@/views/admin/partials/SideBar.vue'
-import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
-import db from "@/firebase"
+//import { doc, setDoc, collection, query, getDocs, getDoc,orderBy, addDoc, where , updateDoc, getDocFromCache} from "firebase/firestore"; 
+import db from "@/firebase/database"
 import { ClassicEditor, Bold, Essentials, Italic, Mention, Paragraph, Undo, Image, ImageInsert, Link, List, MediaEmbed ,Table, TableToolbar,TableCellProperties, TableProperties, } from 'ckeditor5';
 import CKEditor from '@ckeditor/ckeditor5-vue';
+import { getDatabase, ref, set, onValue, remove,query, startAt, endAt, orderByChild } from 'firebase/database'
 
 export default {
     name : "NewCourse",
@@ -106,20 +107,20 @@ export default {
             title: "",
             src:"",
             category:"",
-            text_body:"",
+            content:"",
             category:"",
             course_fees:"",
-            content_id:"",
+            course_id:"",
             message: null,
 
             errors:{
                 title: "",
                 src:"",
                 category:"",
-                text_body:"",
+                content:"",
                 category:"",
                 course_fees:"",
-                content_id:"",
+                course_id:"",
             },
 
             editor: ClassicEditor,
@@ -133,13 +134,12 @@ export default {
               mention: { 
                   // Mention configuration
               },
-            },
-         
+            },       
             
             isLoading: false,
         }
     },
-   
+    
     methods:{      
         onReady( editor ) {
        // console.log( "CKEditor5 Vue Component is ready to use!", editor );
@@ -148,30 +148,27 @@ export default {
       onChange( data ) {
        // console.log( data );
       },
-        async savePost(){
+        async saveCourse(){
                 this.checkValidation();
-                if(!this.errors.src && !this.errors.text_body && !this.errors.title && !this.errors.content_id && !this.errors.category && !this.errors.course_fees){
-                    this.isLoading=true;                  
-                    const saveCollection=collection(db, "contents", )
-                    let saveData=await addDoc(saveCollection, {
-                            title: this.title,
-                            src: this.src,
-                            category: this.category, 
-                            course_fees: this.course_fees,
-                            text_body: this.text_body,
-                            content_id: Number(this.content_id)                     
+                if(!this.errors.src && !this.errors.content && !this.errors.title && !this.errors.course_id && !this.errors.category && !this.errors.course_fees){
+                    this.isLoading=true;                
                     
-                        })
-                    if(saveData.id){
-                        this.message="The course has been created."
-                        this.isLoading=false;              
-                        this.src="";
-                        this.text_body="";
-                        this.title="";           
-                        this.category="",
-                        this.course_fees="",
-                        this.content_id=""      
-                    }
+                    const course={title: this.title, course_fees: this.course_fees, src: this.src, category: this.category, content: this.content, course_id: this.course_id, created_at: Date.now() }
+                    const id = Date.now()
+                    const query = ref(db, 'courses/' + id)
+                    set(query, course)
+                    .then(()=>{
+                            this.message="The course has been created."
+                            this.isLoading=false;              
+                            this.src="";
+                            this.content="";
+                            this.title="";           
+                            this.category="",
+                            this.course_fees="",
+                            this.course_id="" 
+                    }).catch((err)=>{
+                        this.message="Oops..., something went wrong."
+                    })                
                
                 
             }
@@ -181,8 +178,8 @@ export default {
                         case "title":
                             this.errors.title="";
                             break;
-                         case "text_body":
-                            this.errors.text_body="";
+                         case "content":
+                            this.errors.content="";
                             break;
                          case "course_fees":
                             this.errors.course_fees="";                           
@@ -193,26 +190,26 @@ export default {
                          case "src":
                             this.errors.src="";                           
                             break;   
-                        case "content_id":
-                            this.errors.content_id="";                           
+                        case "course_id":
+                            this.errors.course_id="";                           
                             break;    
                 }
         },
         checkValidation(){
-            if(!this.content_id){
-                    this.errors.content_id="The ID field is required.";
+            if(!this.course_id){
+                    this.errors.course_id="The ID field is required.";
             }else{
-                this.errors.content_id="";
+                this.errors.course_id="";
              } 
             if(!this.title){
                     this.errors.title="The title field is required.";
             }else{
                 this.errors.title="";
              }   
-             if(!this.text_body){
-                    this.errors.text_body="The content body field is required.";
+             if(!this.content){
+                    this.errors.content="The content  field is required.";
             }else{
-                this.errors.text_body="";
+                this.errors.content="";
              }   
              if(!this.src){
                     this.errors.src="The image URL field is required.";
